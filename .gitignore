@@ -13,3 +13,16 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+_test/.cq
+_test/cloudquery
+_test/cloudquery.log
+_test/test.db
+_test/*.yaml
+
+.DS_Store
+
+cq-source-openstack
+
+dist
+*.log
