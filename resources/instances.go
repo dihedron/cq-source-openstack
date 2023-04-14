@@ -5,29 +5,37 @@ import (
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/dihedron/cq-plugin-utils/format"
+	"github.com/dihedron/cq-plugin-utils/xformutils"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/format"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
 func Instances() *schema.Table {
 	return &schema.Table{
-		Name:      "openstack_instances",
-		Resolver:  fetchInstances,
-		Transform: transformers.TransformWithStruct(&Instance{}, transformers.WithPrimaryKeys("ID")),
-		Columns: []schema.Column{
-			{
-				Name: "column",
-				Type: schema.TypeString,
-			},
-			// {
-			// 	Name:     "launched_at",
-			// 	Type:     schema.TypeTimestamp,
-			// 	Resolver: resolveLaunchedAt,
-			// },
-		},
+		Name:     "openstack_instances",
+		Resolver: fetchInstances,
+		Transform: transformers.TransformWithStruct(
+			&Instance{},
+			transformers.WithPrimaryKeys("ID"),
+			transformers.WithNameTransformer(xformutils.TagNameTransformer), // use cq-name tags to translate name
+			transformers.WithTypeTransformer(xformutils.TagTypeTransformer), // use cq-type tags to translate type
+			transformers.WithSkipFields("Links"),
+			//transformers.WithUnwrapAllEmbeddedStructs(),
+		),
+		// Columns: []schema.Column{
+		// 	{
+		// 		Name:     "flavor_disk",
+		// 		Type:     schema.TypeInt,
+		// 		Resolver: schema.PathResolver("Flavor.Disk"),
+		// 	},
+		// },
 	}
 }
+
+// func MyPathResolver(path string) schema.ColumnResolver {
+// 	return schema.PathResolver
+// }
 
 func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
@@ -68,12 +76,6 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 	return nil
 }
 
-// func resolveLaunchedAt(ctx context.Context, meta schema.ClientMeta, resource *schema.Resource, c schema.Column) error {
-// 	instance := resource.Item.(Instance)
-// 	resource.Set(c.Name, instance.LaunchedAt)
-// 	return nil
-// }
-
 // Instance is an internal type used to unmarshal more data from the API
 // response than would usually be possible through the ordinary gophercloud
 // struct. OpenStack API microversions enable more response data that is not
@@ -82,21 +84,21 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 // This is also why there is an ExtractInto function that allows you to pass in
 // an arbitrary struct to marshal the response data into.
 type Instance struct {
-	ID        string `json:"id"`
-	TenantID  string `json:"tenant_id"`
-	UserID    string `json:"user_id"`
-	Name      string `json:"name"`
-	CreatedAt Time   `json:"created"`
-	// LaunchedAt   Time   `json:"OS-SRV-USG:launched_at"`
-	UpdatedAt Time `json:"updated"`
-	// TerminatedAt Time   `json:"OS-SRV-USG:terminated_at"`
-	HostID     string `json:"hostid"`
-	Status     string `json:"status"`
-	Progress   int    `json:"progress"`
-	AccessIPv4 string `json:"accessIPv4"`
-	AccessIPv6 string `json:"accessIPv6"`
-	Image      any    `json:"image"`
-	Flavor     struct {
+	ID           string `json:"id"`
+	TenantID     string `json:"tenant_id"`
+	UserID       string `json:"user_id"`
+	Name         string `json:"name"`
+	CreatedAt    Time   `json:"created" cq-name:"created_at" cq-type:"timestamp"`
+	LaunchedAt   Time   `json:"OS-SRV-USG:launched_at" cq-name:"launched_at" cq-type:"timestamp"`
+	UpdatedAt    Time   `json:"updated" cq-name:"updated_at" cq-type:"timestamp"`
+	TerminatedAt Time   `json:"OS-SRV-USG:terminated_at" cq-name:"terminated_at" cq-type:"timestamp"`
+	HostID       string `json:"hostid"`
+	Status       string `json:"status"`
+	Progress     int    `json:"progress"`
+	AccessIPv4   string `json:"accessIPv4"`
+	AccessIPv6   string `json:"accessIPv6"`
+	Image        any    `json:"image"`
+	Flavor       struct {
 		Disk       int `json:"disk"`
 		Ephemeral  int `json:"ephemeral"`
 		ExtraSpecs struct {
@@ -128,25 +130,25 @@ type Instance struct {
 	SecurityGroups []struct {
 		Name string `json:"name"`
 	} `json:"security_groups"`
-	// AttachedVolumes []servers.AttachedVolume `json:"os-extended-volumes:volumes_attached"`
+	AttachedVolumes []servers.AttachedVolume `json:"os-extended-volumes:volumes_attached" cq-name:"attached_volumes"`
 	// NO!!! Fault              servers.Fault            `json:"fault"`
-	Tags         *[]string `json:"tags"`
-	ServerGroups *[]string `json:"server_groups"`
-	// DiskConfig         string    `json:"OS-DCF:diskConfig"`
-	// AvailabilityZone   string    `json:"OS-EXT-AZ:availability_zone"`
-	// Host               string    `json:"OS-EXT-SRV-ATTR:host"`
-	// HostName           string    `json:"OS-EXT-SRV-ATTR:hostname"`
-	// HypervisorHostname string    `json:"OS-EXT-SRV-ATTR:hypervisor_hostname"`
-	// InstanceName       string    `json:"OS-EXT-SRV-ATTR:instance_name"`
-	// KernelID           string    `json:"OS-EXT-SRV-ATTR:kernel_id"`
-	// LaunchIndex        int       `json:"OS-EXT-SRV-ATTR:launch_index"`
-	// RAMDiskID          string    `json:"OS-EXT-SRV-ATTR:ramdisk_id"`
-	// ReservationID      string    `json:"OS-EXT-SRV-ATTR:reservation_id"`
-	// RootDeviceName     string    `json:"OS-EXT-SRV-ATTR:root_device_name"`
-	// UserData           string    `json:"OS-EXT-SRV-ATTR:user_data"`
-	// PowerState         int       `json:"OS-EXT-STS:power_state"`
-	// VMState            string    `json:"OS-EXT-STS:vm_state"`
-	ConfigDrive string `json:"config_drive"`
-	Description string `json:"description"`
+	Tags               *[]string `json:"tags"`
+	ServerGroups       *[]string `json:"server_groups"`
+	DiskConfig         string    `json:"OS-DCF:diskConfig" cq-name:"disk_config"`
+	AvailabilityZone   string    `json:"OS-EXT-AZ:availability_zone" cq-name:"availability_zone"`
+	Host               string    `json:"OS-EXT-SRV-ATTR:host" cq-name:"host"`
+	HostName           string    `json:"OS-EXT-SRV-ATTR:hostname" cq-name:"hostname"`
+	HypervisorHostname string    `json:"OS-EXT-SRV-ATTR:hypervisor_hostname" cq-name:"hypervisor_hostname"`
+	InstanceName       string    `json:"OS-EXT-SRV-ATTR:instance_name" cq-name:"instance_name"`
+	KernelID           string    `json:"OS-EXT-SRV-ATTR:kernel_id" cq-name:"kernel_id"`
+	LaunchIndex        int       `json:"OS-EXT-SRV-ATTR:launch_index" cq-name:"launch_index"`
+	RAMDiskID          string    `json:"OS-EXT-SRV-ATTR:ramdisk_id" cq-name:"ramdisk_id"`
+	ReservationID      string    `json:"OS-EXT-SRV-ATTR:reservation_id" cq-name:"reservation_id"`
+	RootDeviceName     string    `json:"OS-EXT-SRV-ATTR:root_device_name" cq-name:"root_device_name"`
+	UserData           string    `json:"OS-EXT-SRV-ATTR:user_data" cq-name:"user_data" cq-type:"json"`
+	PowerState         int       `json:"OS-EXT-STS:power_state" cq-name:"power_state"`
+	VMState            string    `json:"OS-EXT-STS:vm_state" cq-name:"vm_state"`
+	ConfigDrive        string    `json:"config_drive"`
+	Description        string    `json:"description"`
 	//	NO!!! TaskState          interface{}              `json:"OS-EXT-STS:task_state"`
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/cloudquery/plugin-sdk/plugins/source"
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/specs"
-	"github.com/dihedron/cq-source-openstack/format"
+	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/rs/zerolog"

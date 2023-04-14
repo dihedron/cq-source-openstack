@@ -1,6 +1,10 @@
-.PHONY: test
-test: build
-	cloudquery sync config.yaml --log-level=debug
+.PHONY: lab
+lab: build
+	cloudquery sync lab.yaml --log-level=debug --telemetry-level=none
+
+.PHONY: silver
+silver: build
+	cloudquery sync silver.yaml --log-level=debug --telemetry-level=none
 
 .PHONY: build
 build:
