@@ -8,6 +8,7 @@ import (
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/xformutils"
 	"github.com/dihedron/cq-source-openstack/client"
+	"github.com/dihedron/cq-source-openstack/mapping"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
@@ -21,21 +22,135 @@ func Instances() *schema.Table {
 			transformers.WithNameTransformer(xformutils.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(xformutils.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),
-			//transformers.WithUnwrapAllEmbeddedStructs(),
 		),
-		// Columns: []schema.Column{
-		// 	{
-		// 		Name:     "flavor_disk",
-		// 		Type:     schema.TypeInt,
-		// 		Resolver: schema.PathResolver("Flavor.Disk"),
-		// 	},
-		// },
+		Columns: []schema.Column{
+			{
+				Name:        "flavor_name",
+				Type:        schema.TypeString,
+				Description: "The original name of the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.OriginalName"),
+			},
+			{
+				Name:        "flavor_vcpus",
+				Type:        schema.TypeInt,
+				Description: "The number of virtual CPUs in the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.VCPUs"),
+			},
+			{
+				Name:        "flavor_vgpus",
+				Type:        schema.TypeInt,
+				Description: "The number of virtual GPUs in the flavor used to start the instance.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("Flavor.ExtraSpecs.VGPUs"),
+					mapping.ToInt(),
+					mapping.NilIfZero(),
+				),
+			},
+			{
+				Name:        "flavor_cores",
+				Type:        schema.TypeInt,
+				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("Flavor.ExtraSpecs.CPUCores"),
+					mapping.ToInt(),
+					mapping.NilIfZero(),
+				),
+			},
+			{
+				Name:        "flavor_sockets",
+				Type:        schema.TypeInt,
+				Description: "The number of CPU sockets in the flavor used to start the instance.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("Flavor.ExtraSpecs.CPUSockets"),
+					mapping.ToInt(),
+					mapping.NilIfZero(),
+				),
+			},
+			{
+				Name:        "flavor_ram",
+				Type:        schema.TypeInt,
+				Description: "The amount of RAM in the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.RAM"),
+			},
+			{
+				Name:        "flavor_disk",
+				Type:        schema.TypeInt,
+				Description: "The size of the disk in the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.Disk"),
+			},
+			{
+				Name:        "flavor_swap",
+				Type:        schema.TypeInt,
+				Description: "The size of the swap disk in the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.Swap"),
+			},
+			{
+				Name:        "flavor_ephemeral",
+				Type:        schema.TypeInt,
+				Description: "The size of the ephemeral disk in the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.Ephemeral"),
+			},
+			{
+				Name:        "flavor_rng_allowed",
+				Type:        schema.TypeBool,
+				Description: "Whether the RNG is allowed on the flavor used to start the instance.",
+				Resolver:    schema.PathResolver("Flavor.ExtraSpecs.RNGAllowed"),
+			},
+			{
+				Name:        "flavor_watchdog_action",
+				Type:        schema.TypeString,
+				Description: "The action to take when the Nova watchdog detects the instance is not responding.",
+				Resolver:    schema.PathResolver("Flavor.ExtraSpecs.WatchdogAction"),
+			},
+			{
+				Name:        "image",
+				Type:        schema.TypeString,
+				Description: "The Glance image used to start the instance.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("Image"),
+					mapping.GetMapEntry("id"),
+					mapping.TrimString(),
+					mapping.NilIfZero(),
+				),
+			},
+			{
+				Name:        "attached_volume_ids",
+				Type:        schema.TypeStringArray,
+				Description: "The volumes attached to the instance.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("AttachedVolumes"),
+					func(ctx context.Context, v any) (any, error) {
+						if v != nil {
+							if volumes, ok := v.([]servers.AttachedVolume); ok {
+								result := []string{}
+								for _, volume := range volumes {
+									result = append(result, volume.ID)
+								}
+								return result, nil
+							}
+						}
+						return nil, nil
+					}),
+			},
+			{
+				Name:        "power_state_name",
+				Type:        schema.TypeString,
+				Description: "The instance power state as a string.",
+				Resolver: mapping.Apply(
+					mapping.GetObjectField("PowerState"),
+					mapping.RemapValue(map[int]string{
+						0: "NOSTATE",
+						1: "RUNNING",
+						3: "PAUSED",
+						4: "SHUTDOWN",
+						6: "CRASHED",
+						7: "SUSPENDED",
+					}),
+				),
+			},
+		},
 	}
 }
-
-// func MyPathResolver(path string) schema.ColumnResolver {
-// 	return schema.PathResolver
-// }
 
 func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
@@ -145,8 +260,8 @@ type Instance struct {
 	RAMDiskID          string    `json:"OS-EXT-SRV-ATTR:ramdisk_id" cq-name:"ramdisk_id"`
 	ReservationID      string    `json:"OS-EXT-SRV-ATTR:reservation_id" cq-name:"reservation_id"`
 	RootDeviceName     string    `json:"OS-EXT-SRV-ATTR:root_device_name" cq-name:"root_device_name"`
-	UserData           string    `json:"OS-EXT-SRV-ATTR:user_data" cq-name:"user_data" cq-type:"json"`
-	PowerState         int       `json:"OS-EXT-STS:power_state" cq-name:"power_state"`
+	UserData           string    `json:"OS-EXT-SRV-ATTR:user_data" cq-name:"user_data"`
+	PowerState         int       `json:"OS-EXT-STS:power_state" cq-name:"power_state_id"`
 	VMState            string    `json:"OS-EXT-STS:vm_state" cq-name:"vm_state"`
 	ConfigDrive        string    `json:"config_drive"`
 	Description        string    `json:"description"`
