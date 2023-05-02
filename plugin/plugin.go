@@ -13,10 +13,10 @@ var (
 
 func Plugin() *source.Plugin {
 	return source.NewPlugin(
-		//"github.com/dihedron/openstack",
 		"github.com/dihedron-openstack",
 		Version,
 		schema.Tables{
+			resources.Attachments(),
 			resources.Instances(),
 			resources.Images(),
 			resources.Networks(),

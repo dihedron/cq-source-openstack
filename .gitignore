@@ -16,8 +16,8 @@
 
 _test/.cq
 _test/cloudquery
-_test/cloudquery.log
-_test/test.sqlite
+_test/*.log
+_test/*.sqlite
 _test/*.yaml
 
 .DS_Store
