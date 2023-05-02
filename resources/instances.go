@@ -164,7 +164,7 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 
 	api := meta.(*client.Client)
 
-	compute, err := api.GetServiceClient(client.ComputeV2)
+	nova, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
 		api.Logger.Error().Err(err).Msg("error retrieving client")
 		return err
@@ -174,7 +174,7 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 		AllTenants: true,
 	}
 
-	allPages, err := servers.List(compute, opts).AllPages()
+	allPages, err := servers.List(nova, opts).AllPages()
 	if err != nil {
 		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing instances with options")
 		return err
