@@ -9,3 +9,7 @@ silver: build
 .PHONY: build
 build:
 	cd .. && make && cd _test
+
+.PHONY: reset
+reset:
+	rm *.log *.sqlite

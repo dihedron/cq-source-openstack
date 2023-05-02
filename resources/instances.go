@@ -6,9 +6,8 @@ import (
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
-	"github.com/dihedron/cq-plugin-utils/xformutils"
+	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/mapping"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
@@ -19,8 +18,8 @@ func Instances() *schema.Table {
 		Transform: transformers.TransformWithStruct(
 			&Instance{},
 			transformers.WithPrimaryKeys("ID"),
-			transformers.WithNameTransformer(xformutils.TagNameTransformer), // use cq-name tags to translate name
-			transformers.WithTypeTransformer(xformutils.TagTypeTransformer), // use cq-type tags to translate type
+			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
+			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),
 		),
 		Columns: []schema.Column{
@@ -40,31 +39,30 @@ func Instances() *schema.Table {
 				Name:        "flavor_vgpus",
 				Type:        schema.TypeInt,
 				Description: "The number of virtual GPUs in the flavor used to start the instance.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("Flavor.ExtraSpecs.VGPUs"),
-					mapping.ToInt(),
-					mapping.OrDefault(0),
-					// mapping.NilIfZero(),
+				Resolver: transform.Apply(
+					transform.GetObjectField("Flavor.ExtraSpecs.VGPUs"),
+					transform.ToInt(),
+					transform.OrDefault(0),
 				),
 			},
 			{
 				Name:        "flavor_cores",
 				Type:        schema.TypeInt,
 				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("Flavor.ExtraSpecs.CPUCores"),
-					mapping.ToInt(),
-					mapping.NilIfZero(),
+				Resolver: transform.Apply(
+					transform.GetObjectField("Flavor.ExtraSpecs.CPUCores"),
+					transform.ToInt(),
+					transform.OrDefault(0),
 				),
 			},
 			{
 				Name:        "flavor_sockets",
 				Type:        schema.TypeInt,
 				Description: "The number of CPU sockets in the flavor used to start the instance.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("Flavor.ExtraSpecs.CPUSockets"),
-					mapping.ToInt(),
-					mapping.NilIfZero(),
+				Resolver: transform.Apply(
+					transform.GetObjectField("Flavor.ExtraSpecs.CPUSockets"),
+					transform.ToInt(),
+					transform.OrDefault(0),
 				),
 			},
 			{
@@ -107,19 +105,19 @@ func Instances() *schema.Table {
 				Name:        "image",
 				Type:        schema.TypeString,
 				Description: "The Glance image used to start the instance.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("Image"),
-					mapping.GetMapEntry[string, any]("id"),
-					mapping.TrimString(),
-					mapping.NilIfZero(),
+				Resolver: transform.Apply(
+					transform.GetObjectField("Image"),
+					transform.GetMapEntry[string, any]("id"),
+					transform.TrimString(),
+					transform.NilIfZero(),
 				),
 			},
 			{
 				Name:        "attached_volume_ids",
 				Type:        schema.TypeStringArray,
 				Description: "The volumes attached to the instance.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("AttachedVolumes"),
+				Resolver: transform.Apply(
+					transform.GetObjectField("AttachedVolumes"),
 					func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 						if v != nil {
 							if volumes, ok := v.([]servers.AttachedVolume); ok {
@@ -137,9 +135,9 @@ func Instances() *schema.Table {
 				Name:        "power_state_name",
 				Type:        schema.TypeString,
 				Description: "The instance power state as a string.",
-				Resolver: mapping.Apply(
-					mapping.GetObjectField("PowerState"),
-					mapping.RemapValue(map[int]string{
+				Resolver: transform.Apply(
+					transform.GetObjectField("PowerState"),
+					transform.RemapValue(map[int]string{
 						0: "NOSTATE",
 						1: "RUNNING",
 						3: "PAUSED",
@@ -153,9 +151,9 @@ func Instances() *schema.Table {
 			// 	Name:        "user_data",
 			// 	Type:        schema.TypeString,
 			// 	Description: "The user data associated with the VM instance.",
-			// 	Resolver: mapping.Apply(
-			// 		mapping.GetObjectField("UserData"),
-			// 		mapping.DecodeBase64(),
+			// 	Resolver: transform.Apply(
+			// 		transform.GetObjectField("UserData"),
+			// 		transform.DecodeBase64(),
 			// 	),
 			// },
 		},
