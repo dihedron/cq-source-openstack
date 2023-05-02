@@ -18,6 +18,7 @@ func Plugin() *source.Plugin {
 		Version,
 		schema.Tables{
 			resources.Instances(),
+			resources.Images(),
 		},
 		client.New,
 	)
