@@ -43,7 +43,8 @@ func Instances() *schema.Table {
 				Resolver: mapping.Apply(
 					mapping.GetObjectField("Flavor.ExtraSpecs.VGPUs"),
 					mapping.ToInt(),
-					mapping.NilIfZero(),
+					mapping.OrDefault(0),
+					// mapping.NilIfZero(),
 				),
 			},
 			{
@@ -108,7 +109,7 @@ func Instances() *schema.Table {
 				Description: "The Glance image used to start the instance.",
 				Resolver: mapping.Apply(
 					mapping.GetObjectField("Image"),
-					mapping.GetMapEntry("id"),
+					mapping.GetMapEntry[string, any]("id"),
 					mapping.TrimString(),
 					mapping.NilIfZero(),
 				),
@@ -119,7 +120,7 @@ func Instances() *schema.Table {
 				Description: "The volumes attached to the instance.",
 				Resolver: mapping.Apply(
 					mapping.GetObjectField("AttachedVolumes"),
-					func(ctx context.Context, v any) (any, error) {
+					func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 						if v != nil {
 							if volumes, ok := v.([]servers.AttachedVolume); ok {
 								result := []string{}
@@ -148,6 +149,15 @@ func Instances() *schema.Table {
 					}),
 				),
 			},
+			// {
+			// 	Name:        "user_data",
+			// 	Type:        schema.TypeString,
+			// 	Description: "The user data associated with the VM instance.",
+			// 	Resolver: mapping.Apply(
+			// 		mapping.GetObjectField("UserData"),
+			// 		mapping.DecodeBase64(),
+			// 	),
+			// },
 		},
 	}
 }

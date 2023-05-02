@@ -2,8 +2,9 @@ package mapping
 
 import (
 	"context"
-	"errors"
+	"encoding/base64"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-type Transform func(ctx context.Context, v any) (any, error)
+type Transform func(ctx context.Context, meta schema.ClientMeta, r *schema.Resource, c schema.Column, v any) (any, error)
 
 type key string
 
@@ -28,12 +29,12 @@ func Apply(transforms ...Transform) schema.ColumnResolver {
 			err   error
 		)
 
-		ctx = context.WithValue(ctx, MetaKey, meta)
-		ctx = context.WithValue(ctx, ResourceKey, r)
-		ctx = context.WithValue(ctx, ColumnKey, c)
+		// ctx = context.WithValue(ctx, MetaKey, meta)
+		// ctx = context.WithValue(ctx, ResourceKey, r)
+		// ctx = context.WithValue(ctx, ColumnKey, c)
 
 		for _, transform := range transforms {
-			value, err = transform(ctx, value)
+			value, err = transform(ctx, meta, r, c, value)
 			if err != nil {
 				return err
 			}
@@ -42,41 +43,36 @@ func Apply(transforms ...Transform) schema.ColumnResolver {
 	}
 }
 
+// GetObjectField gets the value from a Golang object by extracting
+// the value associated with the field as per the path.
 func GetObjectField(path string) Transform {
-	return func(ctx context.Context, _ any) (any, error) {
-		v := ctx.Value(ResourceKey)
-		if v == nil {
-			return nil, errors.New("no resource info in context")
-		}
-		if r, ok := v.(*schema.Resource); ok {
-			value := funk.Get(r.Item, path, funk.WithAllowZero())
-			return value, nil
-		}
-		return nil, errors.New("")
+	return func(ctx context.Context, _ schema.ClientMeta, r *schema.Resource, _ schema.Column, _ any) (any, error) {
+		value := funk.Get(r.Item, path, funk.WithAllowZero())
+		return value, nil
 	}
 }
 
-func GetMapEntry[K comparable](key K) Transform {
-	return func(ctx context.Context, v any) (any, error) {
+// GetMapEntry returns the value associated with the given map key; it assumes
+// that the input value is a map where the key is of type K, and the value
+// is of type V.
+func GetMapEntry[K comparable, V any](key K) Transform {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if v != nil {
-			// log.Printf("v not nil: '%v': %T", v, v)
 			switch value := v.(type) {
-			case map[K]any:
-				// log.Printf("v is map")
+			case map[K]V:
 				if t, ok := value[key]; ok {
 					return t, nil
 				}
-				// default:
-				// 	return nil, fmt.Errorf("invalid type: expected map, got %T", v)
 			}
 		}
-		// log.Printf("returning %q", result)
 		return nil, nil
 	}
 }
 
+// TrimString assumes that the current valule is a string and trims it
+// of its spaces.
 func TrimString() Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if v == nil {
 			return nil, nil
 		}
@@ -87,8 +83,10 @@ func TrimString() Transform {
 	}
 }
 
+// NilIfZero returns nil if the current value is the zero value of
+// its respective type.
 func NilIfZero() Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if v == nil {
 			return nil, nil
 		}
@@ -99,8 +97,9 @@ func NilIfZero() Transform {
 	}
 }
 
+// ToString converts the current value into its string representation.
 func ToString() Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if v == nil {
 			return nil, nil
 		}
@@ -113,8 +112,10 @@ func ToString() Transform {
 	}
 }
 
+// ToInt converts the value to an int; numeric types are cast into an int,
+// whereas strings are parsed.
 func ToInt() Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		switch v := v.(type) {
 		case int:
 			return v, nil
@@ -152,8 +153,10 @@ func ToInt() Transform {
 	}
 }
 
+// OrDefault sets the current value to the given default value
+// if it is nil.
 func OrDefault(value any) Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if v == nil {
 			return value, nil
 		}
@@ -161,8 +164,11 @@ func OrDefault(value any) Transform {
 	}
 }
 
+// RemapValue remaps the current value to a different value according
+// to the input map; it can be used to convert e.g. integer values into
+// their string representations.
 func RemapValue[K comparable, V any](remap map[K]V) Transform {
-	return func(ctx context.Context, v any) (any, error) {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 		if key, ok := v.(K); ok {
 			if value, ok := remap[key]; ok {
 				return value, nil
@@ -172,5 +178,25 @@ func RemapValue[K comparable, V any](remap map[K]V) Transform {
 		}
 		var t K
 		return nil, fmt.Errorf("invalid data type: expected %T, got %T", t, v)
+	}
+}
+
+// DecodeBase64 decodes the input value (if it is a string) from base64
+// and returns it as a string.
+func DecodeBase64() Transform {
+	return func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
+		log.Printf("DecodeBase64: got %v (type %T)", v, v)
+		if v == nil {
+			return nil, nil
+		}
+		if v, ok := v.(string); ok {
+			decoded, err := base64.StdEncoding.DecodeString(v)
+			if err == nil {
+				return string(decoded), nil
+			} else {
+				return nil, err
+			}
+		}
+		return nil, fmt.Errorf("invalid data type: expected string, got %T", v)
 	}
 }
