@@ -12,4 +12,4 @@ build:
 
 .PHONY: reset
 reset:
-	rm *.log *.sqlite
+	rm -rf *.log *.sqlite
