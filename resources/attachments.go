@@ -29,7 +29,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeTimestamp,
 				Description: "The time at which the attachment was created.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("AttachedAt"),
+					transform.OnObjectField("AttachedAt"),
 					transform.NilIfZero(),
 				),
 			},
@@ -38,7 +38,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeTimestamp,
 				Description: "The time at which the attachment was removed.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("DetachedAt"),
+					transform.OnObjectField("DetachedAt"),
 					transform.NilIfZero(),
 				),
 			},
@@ -47,7 +47,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The access mode of the volume attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.AccessMode"),
+					transform.OnObjectField("ConnectionInfo.AccessMode"),
 					transform.NilIfZero(),
 				),
 			},
@@ -56,7 +56,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The mode in which the volume is attached.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("AttachMode"),
+					transform.OnObjectField("AttachMode"),
 					transform.NilIfZero(),
 				),
 			},
@@ -65,7 +65,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The ID of the volume attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.AttachmentID"),
+					transform.OnObjectField("ConnectionInfo.AttachmentID"),
 					transform.NilIfZero(),
 				),
 			},
@@ -80,7 +80,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The name of the user that attached the volume.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.AuthUsername"),
+					transform.OnObjectField("ConnectionInfo.AuthUsername"),
 					transform.NilIfZero(),
 				),
 			},
@@ -89,7 +89,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The name of the cluster.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.ClusterName"),
+					transform.OnObjectField("ConnectionInfo.ClusterName"),
 					transform.NilIfZero(),
 				),
 			},
@@ -98,7 +98,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeBool,
 				Description: "The name of the cluster.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Discard"),
+					transform.OnObjectField("ConnectionInfo.Discard"),
 				),
 			},
 			{
@@ -106,7 +106,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The type of the driver.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.DriverVolumeType"),
+					transform.OnObjectField("ConnectionInfo.DriverVolumeType"),
 					transform.NilIfZero(),
 				),
 			},
@@ -115,7 +115,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeBool,
 				Description: "Whether the volume is encrypted.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Encrypted"),
+					transform.OnObjectField("ConnectionInfo.Encrypted"),
 				),
 			},
 			{
@@ -123,7 +123,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeStringArray,
 				Description: "The storage hosts that hold the data in the volume.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Hosts"),
+					transform.OnObjectField("ConnectionInfo.Hosts"),
 				),
 			},
 			{
@@ -131,7 +131,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeBool,
 				Description: "The keyring associated with the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Keyring"),
+					transform.OnObjectField("ConnectionInfo.Keyring"),
 					transform.NilIfZero(),
 				),
 			},
@@ -140,7 +140,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The name of the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Name"),
+					transform.OnObjectField("ConnectionInfo.Name"),
 					transform.NilIfZero(),
 				),
 			},
@@ -149,7 +149,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeStringArray,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.Ports"),
+					transform.OnObjectField("ConnectionInfo.Ports"),
 					transform.NilIfZero(),
 				),
 			},
@@ -158,7 +158,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.SecretType"),
+					transform.OnObjectField("ConnectionInfo.SecretType"),
 					transform.NilIfZero(),
 				),
 			},
@@ -167,7 +167,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.SecretUUID"),
+					transform.OnObjectField("ConnectionInfo.SecretUUID"),
 					transform.NilIfZero(),
 				),
 			},
@@ -176,7 +176,7 @@ func Attachments() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("ConnectionInfo.VolumeID"),
+					transform.OnObjectField("ConnectionInfo.VolumeID"),
 					transform.NilIfZero(),
 				),
 			},

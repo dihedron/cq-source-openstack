@@ -20,6 +20,7 @@ func Plugin() *source.Plugin {
 			resources.Instances(),
 			resources.Images(),
 			resources.Networks(),
+			resources.Ports(),
 		},
 		client.New,
 	)

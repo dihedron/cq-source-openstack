@@ -40,7 +40,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of virtual GPUs in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("Flavor.ExtraSpecs.VGPUs"),
+					transform.OnObjectField("Flavor.ExtraSpecs.VGPUs"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -50,7 +50,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("Flavor.ExtraSpecs.CPUCores"),
+					transform.OnObjectField("Flavor.ExtraSpecs.CPUCores"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -60,7 +60,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of CPU sockets in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("Flavor.ExtraSpecs.CPUSockets"),
+					transform.OnObjectField("Flavor.ExtraSpecs.CPUSockets"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -106,7 +106,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The Glance image used to start the instance.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("Image"),
+					transform.OnObjectField("Image"),
 					transform.GetMapEntry[string, any]("id"),
 					transform.TrimString(),
 					transform.NilIfZero(),
@@ -117,7 +117,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeStringArray,
 				Description: "The volumes attached to the instance.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("AttachedVolumes"),
+					transform.OnObjectField("AttachedVolumes"),
 					func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
 						if v != nil {
 							if volumes, ok := v.([]servers.AttachedVolume); ok {
@@ -136,7 +136,7 @@ func Instances() *schema.Table {
 				Type:        schema.TypeString,
 				Description: "The instance power state as a string.",
 				Resolver: transform.Apply(
-					transform.GetObjectField("PowerState"),
+					transform.OnObjectField("PowerState"),
 					transform.RemapValue(map[int]string{
 						0: "NOSTATE",
 						1: "RUNNING",
@@ -152,7 +152,7 @@ func Instances() *schema.Table {
 			// 	Type:        schema.TypeString,
 			// 	Description: "The user data associated with the VM instance.",
 			// 	Resolver: transform.Apply(
-			// 		transform.GetObjectField("UserData"),
+			// 		transform.OnObjectField("UserData"),
 			// 		transform.DecodeBase64(),
 			// 	),
 			// },

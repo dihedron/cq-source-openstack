@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/cloudquery/plugin-sdk v1.45.0
-	github.com/dihedron/cq-plugin-utils v0.0.0-20230502102337-80b350c954c2
+	github.com/dihedron/cq-plugin-utils v0.0.0-20230503155719-71fd3f6392df
 	github.com/gophercloud/gophercloud v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/rs/zerolog v1.29.1
@@ -39,3 +39,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/thoas/go-funk v0.9.3 => github.com/dihedron/go-funk v0.0.0-20230503154649-f530b38601cc
