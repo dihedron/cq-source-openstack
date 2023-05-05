@@ -22,6 +22,7 @@ func Plugin() *source.Plugin {
 			resources.Networks(),
 			resources.Ports(),
 			resources.Projects(),
+			resources.SecurityGroups(),
 			resources.Users(),
 			resources.Volumes(),
 		},
