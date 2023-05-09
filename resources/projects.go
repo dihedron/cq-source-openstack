@@ -63,7 +63,8 @@ func fetchProjects(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 			break
 		}
 		project := project
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(project)).Msg("streaming project")
+		//api.Logger.Debug().Str("data", format.ToPrettyJSON(project)).Msg("streaming project")
+		api.Logger.Debug().Str("id", project.ID).Msg("streaming project")
 		res <- project
 	}
 	return nil

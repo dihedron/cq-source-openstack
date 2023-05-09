@@ -69,7 +69,8 @@ func fetchVolumes(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 			break
 		}
 		volume := volume
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(volume)).Msg("streaming volume")
+		// api.Logger.Debug().Str("data", format.ToPrettyJSON(volume)).Msg("streaming volume")
+		api.Logger.Debug().Str("data", volume.ID).Msg("streaming volume")
 		res <- volume
 	}
 	return nil

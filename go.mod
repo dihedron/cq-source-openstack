@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/cloudquery/plugin-sdk v1.45.0
-	github.com/dihedron/cq-plugin-utils v0.0.0-20230503155719-71fd3f6392df
+	github.com/dihedron/cq-plugin-utils v0.0.0-20230509133414-de7082fa4a7e
 	github.com/gophercloud/gophercloud v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/rs/zerolog v1.29.1

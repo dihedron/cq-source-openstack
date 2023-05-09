@@ -76,7 +76,8 @@ func fetchPorts(ctx context.Context, meta schema.ClientMeta, parent *schema.Reso
 			break
 		}
 		port := port
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(port)).Msg("streaming port")
+		//api.Logger.Debug().Str("data", format.ToPrettyJSON(port)).Msg("streaming port")
+		api.Logger.Debug().Str("id", port.ID).Msg("streaming port")
 		res <- port
 	}
 	return nil

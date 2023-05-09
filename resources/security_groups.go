@@ -66,7 +66,8 @@ func fetchSecurityGroups(ctx context.Context, meta schema.ClientMeta, parent *sc
 			break
 		}
 		group := group
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(group)).Msg("streaming security group")
+		// api.Logger.Debug().Str("data", format.ToPrettyJSON(group)).Msg("streaming security group")
+		api.Logger.Debug().Str("data", group.ID).Msg("streaming security group")
 		res <- group
 	}
 	return nil

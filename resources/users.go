@@ -63,7 +63,8 @@ func fetchUsers(ctx context.Context, meta schema.ClientMeta, parent *schema.Reso
 			break
 		}
 		user := user
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(user)).Msg("streaming user")
+		// api.Logger.Debug().Str("data", format.ToPrettyJSON(user)).Msg("streaming user")
+		api.Logger.Debug().Str("data", user.ID).Msg("streaming user")
 		res <- user
 	}
 	return nil

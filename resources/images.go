@@ -55,7 +55,8 @@ func fetchImages(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 			break
 		}
 		image := image
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(image)).Msg("streaming image")
+		// api.Logger.Debug().Str("data", format.ToPrettyJSON(image)).Msg("streaming image")
+		api.Logger.Debug().Str("id", image.ID).Msg("streaming image")
 		res <- image
 	}
 	return nil

@@ -55,7 +55,8 @@ func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 			break
 		}
 		network := network
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(network)).Msg("streaming network")
+		//api.Logger.Debug().Str("data", format.ToPrettyJSON(network)).Msg("streaming network")
+		api.Logger.Debug().Str("id", network.ID).Msg("streaming network")
 		res <- network
 	}
 	return nil

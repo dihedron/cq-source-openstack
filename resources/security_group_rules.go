@@ -66,7 +66,8 @@ func fetchSecurityGroupRules(ctx context.Context, meta schema.ClientMeta, parent
 			break
 		}
 		rule := rule
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(rule)).Msg("streaming security group rules")
+		// api.Logger.Debug().Str("data", format.ToPrettyJSON(rule)).Msg("streaming security group rules")
+		api.Logger.Debug().Str("id", rule.ID).Msg("streaming security group rule")
 		res <- rule
 	}
 	return nil

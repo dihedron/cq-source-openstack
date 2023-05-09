@@ -20,87 +20,13 @@ func Instances() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links"),
+			transformers.WithSkipFields("Links", "Flavor", "Addresses"),
 		),
+		Relations: []*schema.Table{
+			InstanceAddresses(),
+			InstanceFlavors(),
+		},
 		Columns: []schema.Column{
-			{
-				Name:        "flavor_name",
-				Type:        schema.TypeString,
-				Description: "The original name of the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.OriginalName"),
-			},
-			{
-				Name:        "flavor_vcpus",
-				Type:        schema.TypeInt,
-				Description: "The number of virtual CPUs in the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.VCPUs"),
-			},
-			{
-				Name:        "flavor_vgpus",
-				Type:        schema.TypeInt,
-				Description: "The number of virtual GPUs in the flavor used to start the instance.",
-				Resolver: transform.Apply(
-					transform.OnObjectField("Flavor.ExtraSpecs.VGPUs"),
-					transform.ToInt(),
-					transform.OrDefault(0),
-				),
-			},
-			{
-				Name:        "flavor_cores",
-				Type:        schema.TypeInt,
-				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
-				Resolver: transform.Apply(
-					transform.OnObjectField("Flavor.ExtraSpecs.CPUCores"),
-					transform.ToInt(),
-					transform.OrDefault(0),
-				),
-			},
-			{
-				Name:        "flavor_sockets",
-				Type:        schema.TypeInt,
-				Description: "The number of CPU sockets in the flavor used to start the instance.",
-				Resolver: transform.Apply(
-					transform.OnObjectField("Flavor.ExtraSpecs.CPUSockets"),
-					transform.ToInt(),
-					transform.OrDefault(0),
-				),
-			},
-			{
-				Name:        "flavor_ram",
-				Type:        schema.TypeInt,
-				Description: "The amount of RAM in the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.RAM"),
-			},
-			{
-				Name:        "flavor_disk",
-				Type:        schema.TypeInt,
-				Description: "The size of the disk in the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.Disk"),
-			},
-			{
-				Name:        "flavor_swap",
-				Type:        schema.TypeInt,
-				Description: "The size of the swap disk in the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.Swap"),
-			},
-			{
-				Name:        "flavor_ephemeral",
-				Type:        schema.TypeInt,
-				Description: "The size of the ephemeral disk in the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.Ephemeral"),
-			},
-			{
-				Name:        "flavor_rng_allowed",
-				Type:        schema.TypeBool,
-				Description: "Whether the RNG is allowed on the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("Flavor.ExtraSpecs.RNGAllowed"),
-			},
-			{
-				Name:        "flavor_watchdog_action",
-				Type:        schema.TypeString,
-				Description: "The action to take when the Nova watchdog detects the instance is not responding.",
-				Resolver:    schema.PathResolver("Flavor.ExtraSpecs.WatchdogAction"),
-			},
 			{
 				Name:        "image",
 				Type:        schema.TypeString,
@@ -193,7 +119,8 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 			break
 		}
 		instance := instance
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(instance)).Msg("streaming instance")
+		//api.Logger.Debug().Str("data", format.ToPrettyJSON(instance)).Msg("streaming instance")
+		api.Logger.Debug().Str("id", instance.ID).Msg("streaming instance")
 		res <- instance
 	}
 	return nil
@@ -207,44 +134,24 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 // This is also why there is an ExtractInto function that allows you to pass in
 // an arbitrary struct to marshal the response data into.
 type Instance struct {
-	ID           string `json:"id"`
-	TenantID     string `json:"tenant_id"`
-	UserID       string `json:"user_id"`
-	Name         string `json:"name"`
-	CreatedAt    Time   `json:"created" cq-name:"created_at" cq-type:"timestamp"`
-	LaunchedAt   Time   `json:"OS-SRV-USG:launched_at" cq-name:"launched_at" cq-type:"timestamp"`
-	UpdatedAt    Time   `json:"updated" cq-name:"updated_at" cq-type:"timestamp"`
-	TerminatedAt Time   `json:"OS-SRV-USG:terminated_at" cq-name:"terminated_at" cq-type:"timestamp"`
-	HostID       string `json:"hostid"`
-	Status       string `json:"status"`
-	Progress     int    `json:"progress"`
-	AccessIPv4   string `json:"accessIPv4"`
-	AccessIPv6   string `json:"accessIPv6"`
-	Image        any    `json:"image"`
-	Flavor       struct {
-		Disk       int `json:"disk"`
-		Ephemeral  int `json:"ephemeral"`
-		ExtraSpecs struct {
-			CPUCores        string `json:"hw:cpu_cores"`
-			CPUSockets      string `json:"hw:cpu_sockets"`
-			RNGAllowed      string `json:"hw_rng:allowed"`
-			WatchdogAction  string `json:"hw:watchdog_action"`
-			VGPUs           string `json:"resources:VGPU"`
-			TraitCustomVGPU string `json:"trait:CUSTOM_VGPU"`
-		} `json:"extra_specs"`
-		OriginalName string `json:"original_name"`
-		RAM          int    `json:"ram"`
-		Swap         int    `json:"swap"`
-		VCPUs        int    `json:"vcpus"`
-	} `json:"flavor"`
-	Addresses map[string][]struct {
-		MACAddress string `json:"OS-EXT-IPS-MAC:mac_addr"`
-		IPType     string `json:"OS-EXT-IPS:type"`
-		IPAddress  string `json:"addr"`
-		IPVersion  int    `json:"version"`
-	} `json:"addresses"`
-	Metadata map[string]string `json:"metadata"`
-	Links    []struct {
+	ID           string               `json:"id"`
+	TenantID     string               `json:"tenant_id"`
+	UserID       string               `json:"user_id"`
+	Name         string               `json:"name"`
+	CreatedAt    Time                 `json:"created" cq-name:"created_at" cq-type:"timestamp"`
+	LaunchedAt   Time                 `json:"OS-SRV-USG:launched_at" cq-name:"launched_at" cq-type:"timestamp"`
+	UpdatedAt    Time                 `json:"updated" cq-name:"updated_at" cq-type:"timestamp"`
+	TerminatedAt Time                 `json:"OS-SRV-USG:terminated_at" cq-name:"terminated_at" cq-type:"timestamp"`
+	HostID       string               `json:"hostid"`
+	Status       string               `json:"status"`
+	Progress     int                  `json:"progress"`
+	AccessIPv4   string               `json:"accessIPv4"`
+	AccessIPv6   string               `json:"accessIPv6"`
+	Image        any                  `json:"image"`
+	Flavor       Flavor               `json:"flavor"`
+	Addresses    map[string][]Address `json:"addresses"`
+	Metadata     map[string]string    `json:"metadata"`
+	Links        []struct {
 		Href string `json:"href"`
 		Rel  string `json:"rel"`
 	} `json:"links"`

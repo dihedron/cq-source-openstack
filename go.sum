@@ -54,6 +54,8 @@ github.com/dihedron/cq-plugin-utils v0.0.0-20230502102337-80b350c954c2 h1:dPxurX
 github.com/dihedron/cq-plugin-utils v0.0.0-20230502102337-80b350c954c2/go.mod h1:Mixu0De1zn8GABGl0ZbZICPaPqoYApHXYqe22WwIHtM=
 github.com/dihedron/cq-plugin-utils v0.0.0-20230503155719-71fd3f6392df h1:BUx2i/406mb0m7dA8afxtBCQseZDAzhEOWX789bZxss=
 github.com/dihedron/cq-plugin-utils v0.0.0-20230503155719-71fd3f6392df/go.mod h1:mn1lQPbE4MuUbyJ5HIBDMj+hIkIQ+Hhfz0/kIt1kylQ=
+github.com/dihedron/cq-plugin-utils v0.0.0-20230509133414-de7082fa4a7e h1:fA5JCPxH1lbCmwO12ttjuGoZ3oEmYoKnLo/qmzviQTs=
+github.com/dihedron/cq-plugin-utils v0.0.0-20230509133414-de7082fa4a7e/go.mod h1:mn1lQPbE4MuUbyJ5HIBDMj+hIkIQ+Hhfz0/kIt1kylQ=
 github.com/dihedron/go-funk v0.0.0-20230503154649-f530b38601cc h1:rmlc13ZpRMQh2aKeT4pxBvUjhmLRJywgAR05OCcLCtk=
 github.com/dihedron/go-funk v0.0.0-20230503154649-f530b38601cc/go.mod h1:+IWnUfUmFO1+WVYQWQtIJHeRRdaIyyYglZN7xzUPe4Q=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

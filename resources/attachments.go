@@ -241,7 +241,7 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 			api.Logger.Error().Err(err).Msg("error extracting attachments")
 			return err
 		}
-		api.Logger.Debug().Int("count", len(allAttachments)).Msg("attachments retrieved")
+		api.Logger.Debug().Str("project", projectID).Int("count", len(allAttachments)).Msg("attachments retrieved")
 
 		for _, attachment := range allAttachments {
 			if ctx.Err() != nil {
@@ -250,7 +250,8 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 			}
 			attachment := attachment
 			attachment.ProjectID = projectID
-			api.Logger.Debug().Str("data", format.ToPrettyJSON(attachment)).Msg("streaming attachment")
+			//api.Logger.Debug().Str("data", format.ToPrettyJSON(attachment)).Msg("streaming attachment")
+			api.Logger.Debug().Str("id", attachment.ID).Msg("streaming attachment")
 			res <- attachment
 		}
 	}
