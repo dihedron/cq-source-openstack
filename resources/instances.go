@@ -20,11 +20,12 @@ func Instances() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links", "Flavor", "Addresses"),
+			transformers.WithSkipFields("Links", "Flavor", "Addresses", "Metadata"),
 		),
 		Relations: []*schema.Table{
 			InstanceAddresses(),
 			InstanceFlavors(),
+			InstanceMetadata(),
 		},
 		Columns: []schema.Column{
 			{
@@ -119,7 +120,6 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 			break
 		}
 		instance := instance
-		//api.Logger.Debug().Str("data", format.ToPrettyJSON(instance)).Msg("streaming instance")
 		api.Logger.Debug().Str("id", instance.ID).Msg("streaming instance")
 		res <- instance
 	}
