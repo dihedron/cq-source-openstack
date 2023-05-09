@@ -20,12 +20,14 @@ func Instances() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links", "Flavor", "Addresses", "Metadata"),
+			transformers.WithSkipFields("Links", "Flavor", "Addresses", "Metadata", "SecurityGroups"),
 		),
 		Relations: []*schema.Table{
 			InstanceAddresses(),
 			InstanceFlavors(),
 			InstanceMetadata(),
+			InstanceSecurityGroups(),
+			InstanceTags(),
 		},
 		Columns: []schema.Column{
 			{
@@ -138,10 +140,10 @@ type Instance struct {
 	TenantID     string               `json:"tenant_id"`
 	UserID       string               `json:"user_id"`
 	Name         string               `json:"name"`
-	CreatedAt    Time                 `json:"created" cq-name:"created_at" cq-type:"timestamp"`
-	LaunchedAt   Time                 `json:"OS-SRV-USG:launched_at" cq-name:"launched_at" cq-type:"timestamp"`
-	UpdatedAt    Time                 `json:"updated" cq-name:"updated_at" cq-type:"timestamp"`
-	TerminatedAt Time                 `json:"OS-SRV-USG:terminated_at" cq-name:"terminated_at" cq-type:"timestamp"`
+	CreatedAt    *Time                `json:"created" cq-name:"created_at" cq-type:"timestamp"`
+	LaunchedAt   *Time                `json:"OS-SRV-USG:launched_at" cq-name:"launched_at" cq-type:"timestamp"`
+	UpdatedAt    *Time                `json:"updated" cq-name:"updated_at" cq-type:"timestamp"`
+	TerminatedAt *Time                `json:"OS-SRV-USG:terminated_at" cq-name:"terminated_at" cq-type:"timestamp"`
 	HostID       string               `json:"hostid"`
 	Status       string               `json:"status"`
 	Progress     int                  `json:"progress"`

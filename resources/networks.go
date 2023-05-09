@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
@@ -16,7 +17,7 @@ func Networks() *schema.Table {
 		Name:     "openstack_networks",
 		Resolver: fetchNetworks,
 		Transform: transformers.TransformWithStruct(
-			&networks.Network{},
+			&Network{},
 			transformers.WithPrimaryKeys("ID"),
 			// transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			// transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
@@ -42,8 +43,8 @@ func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing networks with options")
 		return err
 	}
-	allNetworks, err := networks.ExtractNetworks(allPages)
-	if err != nil {
+	allNetworks := []*Network{}
+	if err = networks.ExtractNetworksInto(allPages, &allNetworks); err != nil {
 		api.Logger.Error().Err(err).Msg("error extracting networks")
 		return err
 	}
@@ -60,4 +61,51 @@ func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 		res <- network
 	}
 	return nil
+}
+
+type Network struct {
+	// UUID for the network
+	ID string `json:"id"`
+
+	// Human-readable name for the network. Might not be unique.
+	Name string `json:"name"`
+
+	// Description for the network
+	Description string `json:"description"`
+
+	// The administrative state of network. If false (down), the network does not
+	// forward packets.
+	AdminStateUp bool `json:"admin_state_up"`
+
+	// Indicates whether network is currently operational. Possible values include
+	// `ACTIVE', `DOWN', `BUILD', or `ERROR'. Plug-ins might define additional
+	// values.
+	Status string `json:"status"`
+
+	// Subnets associated with this network.
+	Subnets []string `json:"subnets"`
+
+	// TenantID is the project owner of the network.
+	TenantID string `json:"tenant_id"`
+
+	// UpdatedAt and CreatedAt contain ISO-8601 timestamps of when the state of the
+	// network last changed, and when it was created.
+	UpdatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"-"`
+
+	// ProjectID is the project owner of the network.
+	ProjectID string `json:"project_id"`
+
+	// Specifies whether the network resource can be accessed by any tenant.
+	Shared bool `json:"shared"`
+
+	// Availability zone hints groups network nodes that run services like DHCP, L3, FW, and others.
+	// Used to make network resources highly available.
+	AvailabilityZoneHints []string `json:"availability_zone_hints"`
+
+	// Tags optionally set via extensions/attributestags
+	Tags []string `json:"tags"`
+
+	// RevisionNumber optionally set via extensions/standard-attr-revisions
+	RevisionNumber int `json:"revision_number"`
 }
