@@ -20,10 +20,11 @@ func Instances() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links", "Flavor", "Addresses", "Metadata", "SecurityGroups"),
+			transformers.WithSkipFields("Links", "AttachedVolumes", "Flavor", "Addresses", "Metadata", "SecurityGroups"),
 		),
 		Relations: []*schema.Table{
 			InstanceAddresses(),
+			InstanceAttachedVolumes(),
 			InstanceFlavors(),
 			InstanceMetadata(),
 			InstanceSecurityGroups(),
@@ -31,7 +32,7 @@ func Instances() *schema.Table {
 		},
 		Columns: []schema.Column{
 			{
-				Name:        "image",
+				Name:        "image_id",
 				Type:        schema.TypeString,
 				Description: "The Glance image used to start the instance.",
 				Resolver: transform.Apply(
@@ -41,25 +42,25 @@ func Instances() *schema.Table {
 					transform.NilIfZero(),
 				),
 			},
-			{
-				Name:        "attached_volume_ids",
-				Type:        schema.TypeStringArray,
-				Description: "The volumes attached to the instance.",
-				Resolver: transform.Apply(
-					transform.OnObjectField("AttachedVolumes"),
-					func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
-						if v != nil {
-							if volumes, ok := v.([]servers.AttachedVolume); ok {
-								result := []string{}
-								for _, volume := range volumes {
-									result = append(result, volume.ID)
-								}
-								return result, nil
-							}
-						}
-						return nil, nil
-					}),
-			},
+			// {
+			// 	Name:        "attached_volume_ids",
+			// 	Type:        schema.TypeStringArray,
+			// 	Description: "The volumes attached to the instance.",
+			// 	Resolver: transform.Apply(
+			// 		transform.OnObjectField("AttachedVolumes"),
+			// 		func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
+			// 			if v != nil {
+			// 				if volumes, ok := v.([]servers.AttachedVolume); ok {
+			// 					result := []string{}
+			// 					for _, volume := range volumes {
+			// 						result = append(result, volume.ID)
+			// 					}
+			// 					return result, nil
+			// 				}
+			// 			}
+			// 			return nil, nil
+			// 		}),
+			// },
 			{
 				Name:        "power_state_name",
 				Type:        schema.TypeString,
@@ -162,25 +163,25 @@ type Instance struct {
 	SecurityGroups []struct {
 		Name string `json:"name"`
 	} `json:"security_groups"`
-	AttachedVolumes []servers.AttachedVolume `json:"os-extended-volumes:volumes_attached" cq-name:"attached_volumes"`
+	AttachedVolumes    []servers.AttachedVolume `json:"os-extended-volumes:volumes_attached" cq-name:"attached_volumes"`
+	Tags               *[]string                `json:"tags"`
+	ServerGroups       *[]string                `json:"server_groups"`
+	DiskConfig         string                   `json:"OS-DCF:diskConfig" cq-name:"disk_config"`
+	AvailabilityZone   string                   `json:"OS-EXT-AZ:availability_zone" cq-name:"availability_zone"`
+	Host               string                   `json:"OS-EXT-SRV-ATTR:host" cq-name:"host"`
+	HostName           string                   `json:"OS-EXT-SRV-ATTR:hostname" cq-name:"hostname"`
+	HypervisorHostname string                   `json:"OS-EXT-SRV-ATTR:hypervisor_hostname" cq-name:"hypervisor_hostname"`
+	InstanceName       string                   `json:"OS-EXT-SRV-ATTR:instance_name" cq-name:"instance_name"`
+	KernelID           string                   `json:"OS-EXT-SRV-ATTR:kernel_id" cq-name:"kernel_id"`
+	LaunchIndex        int                      `json:"OS-EXT-SRV-ATTR:launch_index" cq-name:"launch_index"`
+	RAMDiskID          string                   `json:"OS-EXT-SRV-ATTR:ramdisk_id" cq-name:"ramdisk_id"`
+	ReservationID      string                   `json:"OS-EXT-SRV-ATTR:reservation_id" cq-name:"reservation_id"`
+	RootDeviceName     string                   `json:"OS-EXT-SRV-ATTR:root_device_name" cq-name:"root_device_name"`
+	UserData           string                   `json:"OS-EXT-SRV-ATTR:user_data" cq-name:"user_data"`
+	PowerState         int                      `json:"OS-EXT-STS:power_state" cq-name:"power_state_id"`
+	VMState            string                   `json:"OS-EXT-STS:vm_state" cq-name:"vm_state"`
+	ConfigDrive        string                   `json:"config_drive"`
+	Description        string                   `json:"description"`
 	// NO!!! Fault              servers.Fault            `json:"fault"`
-	Tags               *[]string `json:"tags"`
-	ServerGroups       *[]string `json:"server_groups"`
-	DiskConfig         string    `json:"OS-DCF:diskConfig" cq-name:"disk_config"`
-	AvailabilityZone   string    `json:"OS-EXT-AZ:availability_zone" cq-name:"availability_zone"`
-	Host               string    `json:"OS-EXT-SRV-ATTR:host" cq-name:"host"`
-	HostName           string    `json:"OS-EXT-SRV-ATTR:hostname" cq-name:"hostname"`
-	HypervisorHostname string    `json:"OS-EXT-SRV-ATTR:hypervisor_hostname" cq-name:"hypervisor_hostname"`
-	InstanceName       string    `json:"OS-EXT-SRV-ATTR:instance_name" cq-name:"instance_name"`
-	KernelID           string    `json:"OS-EXT-SRV-ATTR:kernel_id" cq-name:"kernel_id"`
-	LaunchIndex        int       `json:"OS-EXT-SRV-ATTR:launch_index" cq-name:"launch_index"`
-	RAMDiskID          string    `json:"OS-EXT-SRV-ATTR:ramdisk_id" cq-name:"ramdisk_id"`
-	ReservationID      string    `json:"OS-EXT-SRV-ATTR:reservation_id" cq-name:"reservation_id"`
-	RootDeviceName     string    `json:"OS-EXT-SRV-ATTR:root_device_name" cq-name:"root_device_name"`
-	UserData           string    `json:"OS-EXT-SRV-ATTR:user_data" cq-name:"user_data"`
-	PowerState         int       `json:"OS-EXT-STS:power_state" cq-name:"power_state_id"`
-	VMState            string    `json:"OS-EXT-STS:vm_state" cq-name:"vm_state"`
-	ConfigDrive        string    `json:"config_drive"`
-	Description        string    `json:"description"`
-	//	NO!!! TaskState          interface{}              `json:"OS-EXT-STS:task_state"`
+	// NO!!! TaskState          interface{}              `json:"OS-EXT-STS:task_state"`
 }

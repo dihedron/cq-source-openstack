@@ -7,14 +7,15 @@ import (
 	"github.com/cloudquery/plugin-sdk/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
+	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
 )
 
-func InstanceMetadata() *schema.Table {
+func ImageTags() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_metadata",
-		Resolver: fetchInstanceMetadata,
+		Name:     "openstack_image_tags",
+		Resolver: fetchImageTags,
 		Transform: transformers.TransformWithStruct(
-			&Pair[string, string]{},
+			&Tag{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
@@ -22,20 +23,18 @@ func InstanceMetadata() *schema.Table {
 	}
 }
 
-func fetchInstanceMetadata(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+func fetchImageTags(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
 	api := meta.(*client.Client)
 
-	instance := parent.Item.(*Instance)
+	image := parent.Item.(images.Image)
 
-	for k, v := range instance.Metadata {
-		pair := &Pair[string, string]{
-			Key:   k,
-			Value: v,
+	if image.Tags != nil {
+		for _, v := range image.Tags {
+			tag := &Tag{Value: v}
+			api.Logger.Debug().Str("instance id", image.ID).Msg("streaming image tag")
+			res <- tag
 		}
-		api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance metadata")
-		res <- pair
 	}
-
 	return nil
 }

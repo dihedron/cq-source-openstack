@@ -7,14 +7,15 @@ import (
 	"github.com/cloudquery/plugin-sdk/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
-func InstanceMetadata() *schema.Table {
+func InstanceAttachedVolumes() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_metadata",
-		Resolver: fetchInstanceMetadata,
+		Name:     "openstack_instance_attached_volumes",
+		Resolver: fetchInstanceAttachedVolumes,
 		Transform: transformers.TransformWithStruct(
-			&Pair[string, string]{},
+			&servers.AttachedVolume{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
@@ -22,20 +23,15 @@ func InstanceMetadata() *schema.Table {
 	}
 }
 
-func fetchInstanceMetadata(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+func fetchInstanceAttachedVolumes(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
 	api := meta.(*client.Client)
 
 	instance := parent.Item.(*Instance)
 
-	for k, v := range instance.Metadata {
-		pair := &Pair[string, string]{
-			Key:   k,
-			Value: v,
-		}
-		api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance metadata")
-		res <- pair
+	for _, av := range instance.AttachedVolumes {
+		api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance attached volume")
+		res <- av
 	}
-
 	return nil
 }

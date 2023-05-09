@@ -20,8 +20,13 @@ func Images() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links"),
+			transformers.WithSkipFields("Metadata", "Properties", "Tags"),
 		),
+		Relations: []*schema.Table{
+			ImageMetadata(),
+			ImageProperties(),
+			ImageTags(),
+		},
 	}
 }
 

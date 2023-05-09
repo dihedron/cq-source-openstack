@@ -2,17 +2,19 @@ package resources
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
+	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
 )
 
-func InstanceMetadata() *schema.Table {
+func ImageProperties() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_metadata",
-		Resolver: fetchInstanceMetadata,
+		Name:     "openstack_image_properties",
+		Resolver: fetchImageProperties,
 		Transform: transformers.TransformWithStruct(
 			&Pair[string, string]{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
@@ -22,18 +24,18 @@ func InstanceMetadata() *schema.Table {
 	}
 }
 
-func fetchInstanceMetadata(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+func fetchImageProperties(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
 	api := meta.(*client.Client)
 
-	instance := parent.Item.(*Instance)
+	image := parent.Item.(images.Image)
 
-	for k, v := range instance.Metadata {
+	for k, v := range image.Properties {
 		pair := &Pair[string, string]{
 			Key:   k,
-			Value: v,
+			Value: fmt.Sprintf("%v", v),
 		}
-		api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance metadata")
+		api.Logger.Debug().Str("image id", image.ID).Msg("streaming image property")
 		res <- pair
 	}
 
