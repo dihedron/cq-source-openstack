@@ -32,7 +32,7 @@ func fetchImageTags(ctx context.Context, meta schema.ClientMeta, parent *schema.
 	if image.Tags != nil {
 		for _, v := range image.Tags {
 			tag := &Tag{Value: v}
-			api.Logger.Debug().Str("instance id", image.ID).Msg("streaming image tag")
+			api.Logger.Debug().Str("image id", image.ID).Msg("streaming image tag")
 			res <- tag
 		}
 	}
