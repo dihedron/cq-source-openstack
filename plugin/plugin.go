@@ -17,6 +17,7 @@ func Plugin() *source.Plugin {
 		Version,
 		schema.Tables{
 			resources.Attachments(),
+			resources.Flavors(),
 			resources.Instances(),
 			resources.Images(),
 			resources.Networks(),

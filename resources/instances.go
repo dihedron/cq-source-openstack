@@ -152,7 +152,7 @@ type Instance struct {
 	AccessIPv4   string               `json:"accessIPv4"`
 	AccessIPv6   string               `json:"accessIPv6"`
 	Image        any                  `json:"image"`
-	Flavor       Flavor               `json:"flavor"`
+	Flavor       InstanceFlavor       `json:"flavor"`
 	Addresses    map[string][]Address `json:"addresses"`
 	Metadata     map[string]string    `json:"metadata"`
 	Links        []struct {

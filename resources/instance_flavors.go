@@ -14,7 +14,7 @@ func InstanceFlavors() *schema.Table {
 		Name:     "openstack_instance_flavors",
 		Resolver: fetchInstanceFlavors,
 		Transform: transformers.TransformWithStruct(
-			&Flavor{},
+			&InstanceFlavor{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
@@ -114,7 +114,7 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 	return nil
 }
 
-type Flavor struct {
+type InstanceFlavor struct {
 	Disk       int `json:"disk"`
 	Ephemeral  int `json:"ephemeral"`
 	ExtraSpecs struct {
