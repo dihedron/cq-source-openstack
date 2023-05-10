@@ -17,10 +17,11 @@ func Images() *schema.Table {
 		Resolver: fetchImages,
 		Transform: transformers.TransformWithStruct(
 			&images.Image{},
-			transformers.WithPrimaryKeys("ID"),
+			//transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Metadata", "Properties", "Tags"),
+			//transformers.WithSkipFields("Metadata", "Properties", "Tags"),
+			transformers.WithSkipFields("Links"),
 		),
 		Relations: []*schema.Table{
 			ImageMetadata(),

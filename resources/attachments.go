@@ -18,7 +18,7 @@ func Attachments() *schema.Table {
 		Resolver: fetchAttachments,
 		Transform: transformers.TransformWithStruct(
 			&Attachment{},
-			transformers.WithPrimaryKeys("ID"),
+			// transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),

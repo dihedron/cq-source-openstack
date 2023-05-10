@@ -23,6 +23,10 @@ func Networks() *schema.Table {
 			// transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),
 		),
+		Relations: []*schema.Table{
+			NetworkSubnets(),
+			NetworkTags(),
+		},
 	}
 }
 
