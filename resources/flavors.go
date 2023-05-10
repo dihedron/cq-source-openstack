@@ -24,6 +24,9 @@ func Flavors() *schema.Table {
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),
 		),
+		Relations: []*schema.Table{
+			FlavorAccesses(),
+		},
 	}
 }
 
@@ -37,7 +40,9 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 		return err
 	}
 
-	opts := flavors.ListOpts{}
+	opts := flavors.ListOpts{
+		AccessType: "None",
+	}
 
 	allPages, err := flavors.ListDetail(nova, opts).AllPages()
 	if err != nil {
