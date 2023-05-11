@@ -16,8 +16,10 @@ func Plugin() *source.Plugin {
 		"github.com/dihedron-openstack",
 		Version,
 		schema.Tables{
+			resources.Aggregates(),
 			resources.Attachments(),
 			resources.Flavors(),
+			resources.Hypervisors(),
 			resources.Instances(),
 			resources.Images(),
 			resources.Networks(),
