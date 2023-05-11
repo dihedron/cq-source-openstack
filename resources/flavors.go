@@ -22,7 +22,7 @@ func Flavors() *schema.Table {
 			&Flavor{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links"),
+			transformers.WithSkipFields("Links", "ExtraSpecs"),
 		),
 		Relations: []*schema.Table{
 			FlavorAccesses(),
@@ -62,46 +62,45 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 			break
 		}
 		flavor := flavor
-		api.Logger.Debug().Str("id", flavor.ID).Msg("streaming flavor")
+
+		// retrieve the extra specs
+		extraSpecs := flavors.ListExtraSpecs(nova, *flavor.ID)
+		if err != nil {
+			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error getting flavor extra specs")
+			return err
+		}
+		flavor.ExtraSpecs, err = ExtractFlavorsExtraSpec(extraSpecs, nil)
+		if err != nil {
+			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs")
+			return err
+		}
+		api.Logger.Debug().Str("id", *flavor.ID).Msg("streaming flavor with extra specs")
 		res <- flavor
 	}
 	return nil
 }
 
-// Flavor represent (virtual) hardware configurations for server resources
-// in a region.
 type Flavor struct {
-	// ID is the flavor's unique ID.
-	ID string `json:"id"`
+	ID          *string           `json:"id,omitempty"`
+	Disk        int               `json:"disk"`
+	RAM         int               `json:"ram"`
+	Name        string            `json:"name"`
+	RxTxFactor  *float64          `json:"rxtx_factor"`
+	Swap        int               `json:"-"`
+	VCPUs       int               `json:"vcpus"`
+	IsPublic    *bool             `json:"os-flavor-access:is_public" cq-name:"is_public"`
+	Ephemeral   int               `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
+	Description *string           `json:"description"` // new in version 2.55
+	ExtraSpecs  *FlavorExtraSpecs `json:"extra_specs"`
+}
 
-	// Disk is the amount of root disk, measured in GB.
-	Disk int `json:"disk"`
-
-	// RAM is the amount of memory, measured in MB.
-	RAM int `json:"ram"`
-
-	// Name is the name of the flavor.
-	Name string `json:"name"`
-
-	// RxTxFactor describes bandwidth alterations of the flavor.
-	RxTxFactor float64 `json:"rxtx_factor"`
-
-	// Swap is the amount of swap space, measured in MB.
-	Swap int `json:"-"`
-
-	// VCPUs indicates how many (virtual) CPUs are available for this flavor.
-	VCPUs int `json:"vcpus"`
-
-	// IsPublic indicates whether the flavor is public.
-	IsPublic bool `json:"os-flavor-access:is_public" cq-name:"is_public"`
-
-	// Ephemeral is the amount of ephemeral disk space, measured in GB.
-	Ephemeral int `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
-
-	// Description is a free form description of the flavor. Limited to
-	// 65535 characters in length. Only printable characters are allowed.
-	// New in version 2.55
-	Description string `json:"description"`
+type FlavorExtraSpecs struct {
+	CPUCores        string `json:"hw:cpu_cores"`
+	CPUSockets      string `json:"hw:cpu_sockets"`
+	RNGAllowed      string `json:"hw_rng:allowed"`
+	WatchdogAction  string `json:"hw:watchdog_action"`
+	VGPUs           string `json:"resources:VGPU"`
+	TraitCustomVGPU string `json:"trait:CUSTOM_VGPU"`
 }
 
 func (r *Flavor) UnmarshalJSON(b []byte) error {
@@ -139,3 +138,20 @@ func (r *Flavor) UnmarshalJSON(b []byte) error {
 func ExtractFlavorsInto(r pagination.Page, v interface{}) error {
 	return r.(flavors.FlavorPage).Result.ExtractIntoSlicePtr(v, "flavors")
 }
+
+// Extract interprets any extraSpecsResult as ExtraSpecs, if possible.
+func ExtractFlavorsExtraSpec(r flavors.ListExtraSpecsResult, v interface{}) (*FlavorExtraSpecs, error) {
+	var s struct {
+		ExtraSpecs *FlavorExtraSpecs `json:"extra_specs"`
+	}
+	err := r.ExtractInto(&s)
+	return s.ExtraSpecs, err
+}
+
+// func ExtractExtraSpecsInto(r pagination.Page, v interface{}) {
+// 	var s struct {
+// 		ExtraSpecs map[string]string `json:"extra_specs"`
+// 	}
+// 	err := r.ExtractInto(&s)
+// 	return s.ExtraSpecs, err
+// }

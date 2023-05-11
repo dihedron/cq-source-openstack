@@ -111,8 +111,7 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 		return err
 	}
 	allInstances := []*Instance{}
-	err = servers.ExtractServersInto(allPages, &allInstances)
-	if err != nil {
+	if err = servers.ExtractServersInto(allPages, &allInstances); err != nil {
 		api.Logger.Error().Err(err).Msg("error extracting instances")
 		return err
 	}

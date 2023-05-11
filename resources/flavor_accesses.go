@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
-	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/gophercloud/gophercloud"
@@ -37,19 +36,19 @@ func fetchFlavorAccesses(ctx context.Context, meta schema.ClientMeta, parent *sc
 	}
 
 	flavor := parent.Item.(*Flavor)
-	api.Logger.Debug().Str("flavor id", flavor.ID).Msg("retrieving accesses for flavor")
+	api.Logger.Debug().Str("flavor id", *flavor.ID).Msg("retrieving accesses for flavor")
 
-	allPages, err := flavors.ListAccesses(nova, flavor.ID).AllPages()
+	allPages, err := flavors.ListAccesses(nova, *flavor.ID).AllPages()
 	if err != nil {
 		if _, ok := err.(gophercloud.ErrDefault404); ok {
-			api.Logger.Warn().Err(err).Str("flavor id", flavor.ID).Msg("no flavor accesses for flavor")
+			api.Logger.Warn().Err(err).Str("flavor id", *flavor.ID).Msg("no flavor accesses for flavor")
 			return nil
 		} else {
-			api.Logger.Error().Err(err).Str("flavor id", flavor.ID).Str("err type", fmt.Sprintf("%T", err)).Msg("error listing flavor accesses for flavor")
+			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Str("err type", fmt.Sprintf("%T", err)).Msg("error listing flavor accesses for flavor")
 			return err
 		}
 	}
-	api.Logger.Debug().Str("pages", format.ToJSON(allPages)).Msg("flavor accesses retrieved")
+	api.Logger.Debug().Msg("flavor accesses retrieved")
 
 	allAccesses := []*FlavorAccess{}
 	if err = ExtractFlavorAccessInto(allPages, &allAccesses); err != nil {

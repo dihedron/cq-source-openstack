@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 )
@@ -17,15 +18,14 @@ func InstanceFlavors() *schema.Table {
 			&InstanceFlavor{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
-			transformers.WithSkipFields("ExtraSpecs"),
+			transformers.WithSkipFields("Name", "ExtraSpecs"),
 		),
 		Columns: []schema.Column{
 			{
 				Name:        "name",
 				Type:        schema.TypeString,
 				Description: "The original name of the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("OriginalName"),
+				Resolver:    schema.PathResolver("Name"),
 			},
 			{
 				Name:        "vcpus",
@@ -108,25 +108,18 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 	api := meta.(*client.Client)
 
 	instance := parent.Item.(*Instance)
-	api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance flavor")
+	api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(instance.Flavor)).Msg("streaming instance flavor")
 	res <- instance.Flavor
 
 	return nil
 }
 
 type InstanceFlavor struct {
-	Disk       int `json:"disk"`
-	Ephemeral  int `json:"ephemeral"`
-	ExtraSpecs struct {
-		CPUCores        string `json:"hw:cpu_cores"`
-		CPUSockets      string `json:"hw:cpu_sockets"`
-		RNGAllowed      string `json:"hw_rng:allowed"`
-		WatchdogAction  string `json:"hw:watchdog_action"`
-		VGPUs           string `json:"resources:VGPU"`
-		TraitCustomVGPU string `json:"trait:CUSTOM_VGPU"`
-	} `json:"extra_specs"`
-	OriginalName string `json:"original_name"`
-	RAM          int    `json:"ram"`
-	Swap         int    `json:"swap"`
-	VCPUs        int    `json:"vcpus"`
+	Name       string            `json:"original_name"`
+	Disk       int               `json:"disk"`
+	RAM        int               `json:"ram"`
+	Swap       int               `json:"-"`
+	VCPUs      int               `json:"vcpus"`
+	Ephemeral  int               `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
+	ExtraSpecs *FlavorExtraSpecs `json:"extra_specs"`
 }
