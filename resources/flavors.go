@@ -22,10 +22,11 @@ func Flavors() *schema.Table {
 			&Flavor{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Links", "ExtraSpecs"),
+			transformers.WithSkipFields("Links", "ExtraSpecsRaw", "ExtraSpecsObj", "ExtraSpecsMap"),
 		),
 		Relations: []*schema.Table{
 			FlavorAccesses(),
+			FlavorExtraSpecs(),
 		},
 	}
 }
@@ -69,9 +70,14 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error getting flavor extra specs")
 			return err
 		}
-		flavor.ExtraSpecs, err = ExtractFlavorsExtraSpec(extraSpecs, nil)
+		flavor.ExtraSpecsObj, err = ExtractFlavorsExtraSpecsAsObj(extraSpecs)
 		if err != nil {
-			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs")
+			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into object")
+			return err
+		}
+		flavor.ExtraSpecsMap, err = ExtractFlavorsExtraSpecsAsMap(extraSpecs)
+		if err != nil {
+			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into map")
 			return err
 		}
 		api.Logger.Debug().Str("id", *flavor.ID).Msg("streaming flavor with extra specs")
@@ -81,20 +87,22 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 }
 
 type Flavor struct {
-	ID          *string           `json:"id,omitempty"`
-	Disk        int               `json:"disk"`
-	RAM         int               `json:"ram"`
-	Name        string            `json:"name"`
-	RxTxFactor  *float64          `json:"rxtx_factor"`
-	Swap        int               `json:"-"`
-	VCPUs       int               `json:"vcpus"`
-	IsPublic    *bool             `json:"os-flavor-access:is_public" cq-name:"is_public"`
-	Ephemeral   int               `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
-	Description *string           `json:"description"` // new in version 2.55
-	ExtraSpecs  *FlavorExtraSpecs `json:"extra_specs"`
+	ID            *string               `json:"id,omitempty"`
+	Disk          int                   `json:"disk"`
+	RAM           int                   `json:"ram"`
+	Name          string                `json:"name"`
+	RxTxFactor    *float64              `json:"rxtx_factor"`
+	Swap          int                   `json:"-"`
+	VCPUs         int                   `json:"vcpus"`
+	IsPublic      *bool                 `json:"os-flavor-access:is_public" cq-name:"is_public"`
+	Ephemeral     int                   `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
+	Description   *string               `json:"description"` // new in version 2.55
+	ExtraSpecsRaw json.RawMessage       `json:"extra_specs"`
+	ExtraSpecsObj *FlavorExtraSpecsData `json:"-" cq-name:"extra_specs"`
+	ExtraSpecsMap *map[string]string    `json:"-"`
 }
 
-type FlavorExtraSpecs struct {
+type FlavorExtraSpecsData struct {
 	CPUCores        string `json:"hw:cpu_cores"`
 	CPUSockets      string `json:"hw:cpu_sockets"`
 	RNGAllowed      string `json:"hw_rng:allowed"`
@@ -139,19 +147,18 @@ func ExtractFlavorsInto(r pagination.Page, v interface{}) error {
 	return r.(flavors.FlavorPage).Result.ExtractIntoSlicePtr(v, "flavors")
 }
 
-// Extract interprets any extraSpecsResult as ExtraSpecs, if possible.
-func ExtractFlavorsExtraSpec(r flavors.ListExtraSpecsResult, v interface{}) (*FlavorExtraSpecs, error) {
+func ExtractFlavorsExtraSpecsAsObj(r flavors.ListExtraSpecsResult) (*FlavorExtraSpecsData, error) {
 	var s struct {
-		ExtraSpecs *FlavorExtraSpecs `json:"extra_specs"`
+		ExtraSpecs *FlavorExtraSpecsData `json:"extra_specs"`
 	}
 	err := r.ExtractInto(&s)
 	return s.ExtraSpecs, err
 }
 
-// func ExtractExtraSpecsInto(r pagination.Page, v interface{}) {
-// 	var s struct {
-// 		ExtraSpecs map[string]string `json:"extra_specs"`
-// 	}
-// 	err := r.ExtractInto(&s)
-// 	return s.ExtraSpecs, err
-// }
+func ExtractFlavorsExtraSpecsAsMap(r flavors.ListExtraSpecsResult) (*map[string]string, error) {
+	var s struct {
+		ExtraSpecs map[string]string `json:"extra_specs"`
+	}
+	err := r.ExtractInto(&s)
+	return &s.ExtraSpecs, err
+}

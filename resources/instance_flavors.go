@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
@@ -18,7 +19,7 @@ func InstanceFlavors() *schema.Table {
 			&InstanceFlavor{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			transformers.WithSkipFields("Name", "ExtraSpecs"),
+			transformers.WithSkipFields("Name", "ExtraSpecsObj", "ExtraSpecsMap", "ExtraSpecsRaw"),
 		),
 		Columns: []schema.Column{
 			{
@@ -38,7 +39,7 @@ func InstanceFlavors() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of virtual GPUs in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.OnObjectField("ExtraSpecs.VGPUs"),
+					transform.OnObjectField("ExtraSpecsObj.VGPUs"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -48,7 +49,7 @@ func InstanceFlavors() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.OnObjectField("ExtraSpecs.CPUCores"),
+					transform.OnObjectField("ExtraSpecsObj.CPUCores"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -58,7 +59,7 @@ func InstanceFlavors() *schema.Table {
 				Type:        schema.TypeInt,
 				Description: "The number of CPU sockets in the flavor used to start the instance.",
 				Resolver: transform.Apply(
-					transform.OnObjectField("ExtraSpecs.CPUSockets"),
+					transform.OnObjectField("ExtraSpecsObj.CPUSockets"),
 					transform.ToInt(),
 					transform.OrDefault(0),
 				),
@@ -91,13 +92,13 @@ func InstanceFlavors() *schema.Table {
 				Name:        "rng_allowed",
 				Type:        schema.TypeBool,
 				Description: "Whether the RNG is allowed on the flavor used to start the instance.",
-				Resolver:    schema.PathResolver("ExtraSpecs.RNGAllowed"),
+				Resolver:    schema.PathResolver("ExtraSpecsObj.RNGAllowed"),
 			},
 			{
 				Name:        "watchdog_action",
 				Type:        schema.TypeString,
 				Description: "The action to take when the Nova watchdog detects the instance is not responding.",
-				Resolver:    schema.PathResolver("ExtraSpecs.WatchdogAction"),
+				Resolver:    schema.PathResolver("ExtraSpecsObj.WatchdogAction"),
 			},
 		},
 	}
@@ -108,6 +109,17 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 	api := meta.(*client.Client)
 
 	instance := parent.Item.(*Instance)
+
+	instance.Flavor.ExtraSpecsMap = &map[string]string{}
+	if err := json.Unmarshal(instance.Flavor.ExtraSpecsRaw, &instance.Flavor.ExtraSpecsMap); err != nil {
+		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as map")
+	}
+
+	instance.Flavor.ExtraSpecsObj = &FlavorExtraSpecsData{}
+	if err := json.Unmarshal(instance.Flavor.ExtraSpecsRaw, &instance.Flavor.ExtraSpecsObj); err != nil {
+		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as object")
+	}
+
 	api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(instance.Flavor)).Msg("streaming instance flavor")
 	res <- instance.Flavor
 
@@ -115,11 +127,13 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 }
 
 type InstanceFlavor struct {
-	Name       string            `json:"original_name"`
-	Disk       int               `json:"disk"`
-	RAM        int               `json:"ram"`
-	Swap       int               `json:"-"`
-	VCPUs      int               `json:"vcpus"`
-	Ephemeral  int               `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
-	ExtraSpecs *FlavorExtraSpecs `json:"extra_specs"`
+	Name          string                `json:"original_name"`
+	Disk          int                   `json:"disk"`
+	RAM           int                   `json:"ram"`
+	Swap          int                   `json:"-"`
+	VCPUs         int                   `json:"vcpus"`
+	Ephemeral     int                   `json:"OS-FLV-EXT-DATA:ephemeral" cq-name:"ephemeral"`
+	ExtraSpecsRaw json.RawMessage       `json:"extra_specs"`
+	ExtraSpecsObj *FlavorExtraSpecsData `json:"-" cq-name:"extra_specs"`
+	ExtraSpecsMap *map[string]string    `json:"-"`
 }

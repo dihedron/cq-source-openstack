@@ -17,16 +17,15 @@ func Instances() *schema.Table {
 		Resolver: fetchInstances,
 		Transform: transformers.TransformWithStruct(
 			&Instance{},
-			// transformers.WithPrimaryKeys("ID"),
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			//transformers.WithSkipFields("Links", "AttachedVolumes", "Flavor", "Addresses", "Metadata", "SecurityGroups"),
 			transformers.WithSkipFields("Links"),
 		),
 		Relations: []*schema.Table{
 			InstanceAddresses(),
 			InstanceAttachedVolumes(),
 			InstanceFlavors(),
+			InstanceFlavorExtraSpecs(),
 			InstanceMetadata(),
 			InstanceSecurityGroups(),
 			InstanceTags(),
