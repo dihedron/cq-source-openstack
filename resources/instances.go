@@ -42,25 +42,6 @@ func Instances() *schema.Table {
 					transform.NilIfZero(),
 				),
 			},
-			// {
-			// 	Name:        "attached_volume_ids",
-			// 	Type:        schema.TypeStringArray,
-			// 	Description: "The volumes attached to the instance.",
-			// 	Resolver: transform.Apply(
-			// 		transform.OnObjectField("AttachedVolumes"),
-			// 		func(ctx context.Context, _ schema.ClientMeta, _ *schema.Resource, _ schema.Column, v any) (any, error) {
-			// 			if v != nil {
-			// 				if volumes, ok := v.([]servers.AttachedVolume); ok {
-			// 					result := []string{}
-			// 					for _, volume := range volumes {
-			// 						result = append(result, volume.ID)
-			// 					}
-			// 					return result, nil
-			// 				}
-			// 			}
-			// 			return nil, nil
-			// 		}),
-			// },
 			{
 				Name:        "power_state_name",
 				Type:        schema.TypeString,
@@ -77,15 +58,6 @@ func Instances() *schema.Table {
 					}),
 				),
 			},
-			// {
-			// 	Name:        "user_data",
-			// 	Type:        schema.TypeString,
-			// 	Description: "The user data associated with the VM instance.",
-			// 	Resolver: transform.Apply(
-			// 		transform.OnObjectField("UserData"),
-			// 		transform.DecodeBase64(),
-			// 	),
-			// },
 		},
 	}
 }
