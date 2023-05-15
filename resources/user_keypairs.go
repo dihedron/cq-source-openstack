@@ -12,10 +12,10 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/keypairs"
 )
 
-func KeyPairs() *schema.Table {
+func UserKeyPairs() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_keypairs",
-		Resolver: fetchKeyPairs,
+		Name:     "openstack_user_keypairs",
+		Resolver: fetchUserKeyPairs,
 		Transform: transformers.TransformWithStruct(
 			&keypairs.KeyPair{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
@@ -26,9 +26,11 @@ func KeyPairs() *schema.Table {
 	}
 }
 
-func fetchKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+func fetchUserKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 
 	api := meta.(*client.Client)
+
+	user := parent.Item.(*User)
 
 	compute, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
@@ -36,7 +38,9 @@ func fetchKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 		return err
 	}
 
-	opts := keypairs.ListOpts{}
+	opts := keypairs.ListOpts{
+		UserID: user.ID,
+	}
 
 	allPages, err := keypairs.List(compute, opts).AllPages()
 	if err != nil {
@@ -55,9 +59,8 @@ func fetchKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 			api.Logger.Debug().Msg("context done, exit")
 			break
 		}
-		keypair := keypair
-		api.Logger.Debug().Str("data", format.ToPrettyJSON(keypair)).Msg("streaming keypair")
-		api.Logger.Debug().Str("id", keypair.Fingerprint).Msg("streaming keypair")
+		keypair.UserID = user.ID
+		api.Logger.Debug().Str("user id", keypair.UserID).Str("data", format.ToPrettyJSON(keypair)).Msg("streaming keypair")
 		res <- keypair
 	}
 	return nil

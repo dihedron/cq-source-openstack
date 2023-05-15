@@ -22,7 +22,7 @@ func Plugin() *source.Plugin {
 			resources.Hypervisors(),
 			resources.Instances(),
 			resources.Images(),
-			resources.KeyPairs(),
+			//resources.KeyPairs(),
 			resources.Networks(),
 			resources.Ports(),
 			resources.Projects(),

@@ -20,6 +20,9 @@ func Projects() *schema.Table {
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithSkipFields("Links"),
 		),
+		Relations: []*schema.Table{
+			ProjectLimits(),
+		},
 		// Columns: []schema.Column{
 		// 	{
 		// 		Name:        "tags",
