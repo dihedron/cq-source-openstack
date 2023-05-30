@@ -3,6 +3,7 @@ package resources
 import (
 	"context"
 	"encoding/json"
+	"sync"
 
 	"github.com/cloudquery/plugin-sdk/schema"
 	"github.com/cloudquery/plugin-sdk/transformers"
@@ -110,6 +111,9 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 
 	instance := parent.Item.(*Instance)
 
+	instance.Flavor.lock.Lock()
+	defer instance.Flavor.lock.Unlock()
+
 	instance.Flavor.ExtraSpecsMap = &map[string]string{}
 	if err := json.Unmarshal(instance.Flavor.ExtraSpecsRaw, &instance.Flavor.ExtraSpecsMap); err != nil {
 		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as map")
@@ -120,13 +124,14 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as object")
 	}
 
-	api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(instance.Flavor)).Msg("streaming instance flavor")
+	api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(&instance.Flavor)).Msg("streaming instance flavor")
 	res <- instance.Flavor
 
 	return nil
 }
 
 type InstanceFlavor struct {
+	lock          sync.RWMutex
 	Name          string                `json:"original_name"`
 	Disk          int                   `json:"disk"`
 	RAM           int                   `json:"ram"`

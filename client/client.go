@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/cloudquery/plugin-sdk/plugins/source"
 	"github.com/cloudquery/plugin-sdk/schema"
@@ -14,9 +15,10 @@ import (
 )
 
 type Client struct {
+	mutex    sync.RWMutex
+	services map[ServiceType]*gophercloud.ServiceClient
 	Logger   zerolog.Logger
 	Client   *gophercloud.ProviderClient
-	Services map[ServiceType]*gophercloud.ServiceClient
 	Specs    *Spec
 }
 
@@ -91,20 +93,26 @@ func New(ctx context.Context, logger zerolog.Logger, s specs.Source, opts source
 	return &Client{
 		Logger:   logger,
 		Client:   client,
-		Services: map[ServiceType]*gophercloud.ServiceClient{},
+		services: map[ServiceType]*gophercloud.ServiceClient{},
 		Specs:    &pluginSpec,
 	}, nil
 }
 
 func (c *Client) GetServiceClient(key ServiceType) (*gophercloud.ServiceClient, error) {
 
-	if service, ok := c.Services[key]; ok && service != nil {
+	c.mutex.RLock()
+	if service, ok := c.services[key]; ok && service != nil {
 		c.Logger.Info().Str("type", string(key)).Msg("returning existing service client")
+		c.mutex.RUnlock()
 		return service, nil
 	}
+	c.mutex.RUnlock()
+	return c.initServiceClient(key)
+}
+
+func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient, error) {
 
 	// no existing service client, need to initialise one
-
 	if _, ok := serviceConfigMap[key]; !ok {
 		c.Logger.Error().Str("type", string(key)).Msg("invalid service client type")
 		panic(fmt.Sprintf("invalid service type: %q", key))
@@ -126,7 +134,9 @@ func (c *Client) GetServiceClient(key ServiceType) (*gophercloud.ServiceClient, 
 	client.Microversion = serviceConfigMap[key].getMicroversion(c.Specs)
 
 	// save to object
-	c.Services[key] = client
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	c.services[key] = client
 
 	c.Logger.Info().Str("type", string(key)).Msg("new service client ready")
 
