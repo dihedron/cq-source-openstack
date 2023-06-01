@@ -27,6 +27,9 @@ func fetchInstanceFlavorExtraSpecs(ctx context.Context, meta schema.ClientMeta, 
 
 	instance := parent.Item.(*Instance)
 
+	instance.Flavor.lock.RLock()
+	defer instance.Flavor.lock.RUnlock()
+
 	if instance.Flavor.ExtraSpecsMap != nil {
 		for k, v := range *instance.Flavor.ExtraSpecsMap {
 			pair := &Pair[string, string]{
