@@ -1,0 +1,52 @@
+kind: source
+spec:
+  name: openstack_lab
+  registry: local
+  path: "/data/workspaces/gomods/cq-source-openstack/dist/cq-source-openstack_linux_amd64_v1/cq-source-openstack"
+  version: v1.0.0
+  tables: 
+    ["openstack*"]
+  destinations:
+    - sqlite
+    - postgresql
+  spec:
+    endpoint_url: ${OPENSTACK_ENDPOINT_URL}
+    username: ${OPENSTACK_USERNAME}
+    password: ${OPENSTACK_PASSWORD}
+    project_id: ${OPENSTACK_PROJECT_ID}
+    project_name: ${OPENSTACK_PROJECT_NAME}
+    domain_name: ${OPENSTACK_DOMAIN_NAME}
+    app_credential_id: ${OPENSTACK_APP_CREDENTIAL_ID}
+    app_credential_secret: ${OPENSTACK_APP_CREDENTIAL_SECRET}
+# ---
+# kind: source
+# spec:
+#   name: gitlab_cloud
+#   path: cloudquery/gitlab
+#   version: v3.0.0
+#   tables: ["*"]
+#   destinations: 
+#     - sqlite
+#     - postgresql
+#   spec:
+#     access_token: bs2o3H-ukrPQYueqENza
+#     base_url: https://git.cloud.bankit.it/
+---
+kind: destination
+spec:
+  name: sqlite
+  path: cloudquery/sqlite
+  version: v2.4.4
+  spec:
+    connection_string: ./${OPENSTACK_INSTALLATION}.sqlite
+---
+kind: destination
+spec:
+  name: postgresql
+  registry: github
+  path: cloudquery/postgresql
+  version: v5.0.2
+  spec:
+    connection_string: postgresql://cloudquery:cloudquery@localhost:15433/cloudquery?sslmode=disable    
+#    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable  
+#    connection_string: postgresql://superset:superset@localhost:15432/superset?sslmode=disable
