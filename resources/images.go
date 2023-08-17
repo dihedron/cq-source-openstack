@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -37,7 +37,7 @@ func fetchImages(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 
 	glance, err := api.GetServiceClient(client.ImageServiceV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -45,24 +45,24 @@ func fetchImages(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 
 	allPages, err := images.List(glance, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing images with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing images with options")
 		return err
 	}
 	allImages, err := images.ExtractImages(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting images")
+		api.Logger().Error().Err(err).Msg("error extracting images")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allImages)).Msg("images retrieved")
+	api.Logger().Debug().Int("count", len(allImages)).Msg("images retrieved")
 
 	for _, image := range allImages {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		image := image
-		// api.Logger.Debug().Str("data", format.ToPrettyJSON(image)).Msg("streaming image")
-		api.Logger.Debug().Str("id", image.ID).Msg("streaming image")
+		// api.Logger().Debug().Str("data", format.ToPrettyJSON(image)).Msg("streaming image")
+		api.Logger().Debug().Str("id", image.ID).Msg("streaming image")
 		res <- image
 	}
 	return nil

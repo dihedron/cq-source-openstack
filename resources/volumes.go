@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -43,7 +43,7 @@ func fetchVolumes(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 
 	cinder, err := api.GetServiceClient(client.BlockStorageV3)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -53,24 +53,24 @@ func fetchVolumes(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 
 	allPages, err := volumes.List(cinder, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing volumes with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing volumes with options")
 		return err
 	}
 	allVolumes := []*Volume{}
 	if err := volumes.ExtractVolumesInto(allPages, &allVolumes); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting volumes")
+		api.Logger().Error().Err(err).Msg("error extracting volumes")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allVolumes)).Msg("volumes retrieved")
+	api.Logger().Debug().Int("count", len(allVolumes)).Msg("volumes retrieved")
 
 	for _, volume := range allVolumes {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		volume := volume
-		// api.Logger.Debug().Str("data", format.ToPrettyJSON(volume)).Msg("streaming volume")
-		api.Logger.Debug().Str("data", volume.ID).Msg("streaming volume")
+		// api.Logger().Debug().Str("data", format.ToPrettyJSON(volume)).Msg("streaming volume")
+		api.Logger().Debug().Str("data", volume.ID).Msg("streaming volume")
 		res <- volume
 	}
 	return nil

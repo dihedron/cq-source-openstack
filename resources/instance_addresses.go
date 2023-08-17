@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/pointer"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -32,8 +32,8 @@ func fetchInstanceAddresses(ctx context.Context, meta schema.ClientMeta, parent 
 	for network, addresses := range instance.Addresses {
 		for _, address := range addresses {
 			address.Network = pointer.To(network)
-			//api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToPrettyJSON(address)).Msg("streaming instance addresses")
-			api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance addresses")
+			//api.Logger().Debug().Str("instance id", instance.ID).Str("json", format.ToPrettyJSON(address)).Msg("streaming instance addresses")
+			api.Logger().Debug().Str("instance id", instance.ID).Msg("streaming instance addresses")
 			res <- address
 		}
 	}

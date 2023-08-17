@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/cloudquery/plugin-sdk/plugins/source"
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/specs"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -15,66 +12,66 @@ import (
 )
 
 type Client struct {
+	Client *gophercloud.ProviderClient
+	Spec   Spec
+
+	logger zerolog.Logger
+	// tables   schema.Tables
 	mutex    sync.RWMutex
 	services map[ServiceType]*gophercloud.ServiceClient
-	Logger   zerolog.Logger
-	Client   *gophercloud.ProviderClient
-	Specs    *Spec
 }
 
 func (c *Client) ID() string {
 	return "github.com/dihedron/cq-source-openstack"
 }
 
-func New(ctx context.Context, logger zerolog.Logger, s specs.Source, opts source.Options) (schema.ClientMeta, error) {
-	var pluginSpec Spec
+func (c *Client) Logger() *zerolog.Logger {
+	return &c.logger
+}
 
-	if err := s.UnmarshalSpec(&pluginSpec); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal plugin spec: %w", err)
-	}
+func New(ctx context.Context, logger zerolog.Logger, spec *Spec) (*Client, error) {
 
-	// TODO: Add your client initialization here
-	logger.Debug().Str("spec", format.ToJSON(pluginSpec)).Msg("Plugin Spec")
+	logger.Debug().Str("spec", format.ToJSON(spec)).Msg("plugin configuration")
 
 	auth := gophercloud.AuthOptions{
 		AllowReauth: true,
 	}
 
-	if pluginSpec.EndpointUrl != nil {
-		auth.IdentityEndpoint = *pluginSpec.EndpointUrl
+	if spec.EndpointUrl != nil {
+		auth.IdentityEndpoint = *spec.EndpointUrl
 	}
-	if pluginSpec.UserID != nil {
-		auth.UserID = *pluginSpec.UserID
+	if spec.UserID != nil {
+		auth.UserID = *spec.UserID
 	}
-	if pluginSpec.Username != nil {
-		auth.Username = *pluginSpec.Username
+	if spec.Username != nil {
+		auth.Username = *spec.Username
 	}
-	if pluginSpec.Password != nil {
-		auth.Password = *pluginSpec.Password
+	if spec.Password != nil {
+		auth.Password = *spec.Password
 	}
-	if pluginSpec.ProjectID != nil {
-		auth.TenantID = *pluginSpec.ProjectID
+	if spec.ProjectID != nil {
+		auth.TenantID = *spec.ProjectID
 	}
-	if pluginSpec.ProjectName != nil {
-		auth.TenantName = *pluginSpec.ProjectName
+	if spec.ProjectName != nil {
+		auth.TenantName = *spec.ProjectName
 	}
-	if pluginSpec.DomainID != nil {
-		auth.DomainID = *pluginSpec.DomainID
+	if spec.DomainID != nil {
+		auth.DomainID = *spec.DomainID
 	}
-	if pluginSpec.DomainName != nil {
-		auth.DomainName = *pluginSpec.DomainName
+	if spec.DomainName != nil {
+		auth.DomainName = *spec.DomainName
 	}
-	if pluginSpec.AccessToken != nil {
-		auth.TokenID = *pluginSpec.AccessToken
+	if spec.AccessToken != nil {
+		auth.TokenID = *spec.AccessToken
 	}
-	if pluginSpec.AppCredentialID != nil {
-		auth.ApplicationCredentialID = *pluginSpec.AppCredentialID
+	if spec.AppCredentialID != nil {
+		auth.ApplicationCredentialID = *spec.AppCredentialID
 	}
-	if pluginSpec.AppCredentialSecret != nil {
-		auth.ApplicationCredentialSecret = *pluginSpec.AppCredentialSecret
+	if spec.AppCredentialSecret != nil {
+		auth.ApplicationCredentialSecret = *spec.AppCredentialSecret
 	}
-	if pluginSpec.AllowReauth != nil {
-		auth.AllowReauth = *pluginSpec.AllowReauth
+	if spec.AllowReauth != nil {
+		auth.AllowReauth = *spec.AllowReauth
 	}
 
 	//
@@ -91,10 +88,10 @@ func New(ctx context.Context, logger zerolog.Logger, s specs.Source, opts source
 	logger.Info().Msg("openstack client created")
 
 	return &Client{
-		Logger:   logger,
+		Spec:     *spec,
+		logger:   logger,
 		Client:   client,
 		services: map[ServiceType]*gophercloud.ServiceClient{},
-		Specs:    &pluginSpec,
 	}, nil
 }
 
@@ -102,7 +99,7 @@ func (c *Client) GetServiceClient(key ServiceType) (*gophercloud.ServiceClient, 
 
 	c.mutex.RLock()
 	if service, ok := c.services[key]; ok && service != nil {
-		c.Logger.Info().Str("type", string(key)).Msg("returning existing service client")
+		c.Logger().Info().Str("type", string(key)).Msg("returning existing service client")
 		c.mutex.RUnlock()
 		return service, nil
 	}
@@ -114,31 +111,31 @@ func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient,
 
 	// no existing service client, need to initialise one
 	if _, ok := serviceConfigMap[key]; !ok {
-		c.Logger.Error().Str("type", string(key)).Msg("invalid service client type")
+		c.Logger().Error().Str("type", string(key)).Msg("invalid service client type")
 		panic(fmt.Sprintf("invalid service type: %q", key))
 	}
 
-	c.Logger.Info().Str("type", string(key)).Msg("creating new service client")
+	c.Logger().Info().Str("type", string(key)).Msg("creating new service client")
 
 	region := ""
-	if c.Specs.Region != nil {
-		region = *c.Specs.Region
+	if c.Spec.Region != nil {
+		region = *c.Spec.Region
 	}
 
 	client, err := serviceConfigMap[key].newClient(c.Client, gophercloud.EndpointOpts{Region: region})
 
 	if err != nil {
-		c.Logger.Error().Str("type", string(key)).Err(err).Msg("error creating service client")
+		c.Logger().Error().Str("type", string(key)).Err(err).Msg("error creating service client")
 		return nil, err
 	}
-	client.Microversion = serviceConfigMap[key].getMicroversion(c.Specs)
+	client.Microversion = serviceConfigMap[key].getMicroversion(&c.Spec)
 
 	// save to object
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.services[key] = client
 
-	c.Logger.Info().Str("type", string(key)).Msg("new service client ready")
+	c.Logger().Info().Str("type", string(key)).Msg("new service client ready")
 
 	return client, nil
 }

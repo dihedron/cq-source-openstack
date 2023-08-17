@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"sync"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -25,19 +26,19 @@ func InstanceFlavors() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "name",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The original name of the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("Name"),
 			},
 			{
 				Name:        "vcpus",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The number of virtual CPUs in the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("VCPUs"),
 			},
 			{
 				Name:        "vgpus",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The number of virtual GPUs in the flavor used to start the instance.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ExtraSpecsObj.VGPUs"),
@@ -47,7 +48,7 @@ func InstanceFlavors() *schema.Table {
 			},
 			{
 				Name:        "cores",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The number of virtual CPU cores in the flavor used to start the instance.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ExtraSpecsObj.CPUCores"),
@@ -57,7 +58,7 @@ func InstanceFlavors() *schema.Table {
 			},
 			{
 				Name:        "sockets",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The number of CPU sockets in the flavor used to start the instance.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ExtraSpecsObj.CPUSockets"),
@@ -67,37 +68,37 @@ func InstanceFlavors() *schema.Table {
 			},
 			{
 				Name:        "ram",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The amount of RAM in the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("RAM"),
 			},
 			{
 				Name:        "disk",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The size of the disk in the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("Disk"),
 			},
 			{
 				Name:        "swap",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The size of the swap disk in the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("Swap"),
 			},
 			{
 				Name:        "ephemeral",
-				Type:        schema.TypeInt,
+				Type:        arrow.PrimitiveTypes.Int64,
 				Description: "The size of the ephemeral disk in the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("Ephemeral"),
 			},
 			{
 				Name:        "rng_allowed",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the RNG is allowed on the flavor used to start the instance.",
 				Resolver:    schema.PathResolver("ExtraSpecsObj.RNGAllowed"),
 			},
 			{
 				Name:        "watchdog_action",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The action to take when the Nova watchdog detects the instance is not responding.",
 				Resolver:    schema.PathResolver("ExtraSpecsObj.WatchdogAction"),
 			},
@@ -116,15 +117,15 @@ func fetchInstanceFlavors(ctx context.Context, meta schema.ClientMeta, parent *s
 
 	instance.Flavor.ExtraSpecsMap = &map[string]string{}
 	if err := json.Unmarshal(instance.Flavor.ExtraSpecsRaw, &instance.Flavor.ExtraSpecsMap); err != nil {
-		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as map")
+		api.Logger().Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as map")
 	}
 
 	instance.Flavor.ExtraSpecsObj = &FlavorExtraSpecsData{}
 	if err := json.Unmarshal(instance.Flavor.ExtraSpecsRaw, &instance.Flavor.ExtraSpecsObj); err != nil {
-		api.Logger.Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as object")
+		api.Logger().Error().Err(err).Str("instance id", instance.ID).Msg("error parsing extra specs as object")
 	}
 
-	api.Logger.Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(&instance.Flavor)).Msg("streaming instance flavor")
+	api.Logger().Debug().Str("instance id", instance.ID).Str("json", format.ToJSON(&instance.Flavor)).Msg("streaming instance flavor")
 	res <- instance.Flavor
 
 	return nil

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-source-openstack/client"
 
@@ -36,7 +36,7 @@ func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 
 	neutron, err := api.GetServiceClient(client.NetworkV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -44,24 +44,24 @@ func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 
 	allPages, err := networks.List(neutron, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing networks with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing networks with options")
 		return err
 	}
 	allNetworks := []*Network{}
 	if err = networks.ExtractNetworksInto(allPages, &allNetworks); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting networks")
+		api.Logger().Error().Err(err).Msg("error extracting networks")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allNetworks)).Msg("networks retrieved")
+	api.Logger().Debug().Int("count", len(allNetworks)).Msg("networks retrieved")
 
 	for _, network := range allNetworks {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		network := network
-		//api.Logger.Debug().Str("data", format.ToPrettyJSON(network)).Msg("streaming network")
-		api.Logger.Debug().Str("id", network.ID).Msg("streaming network")
+		//api.Logger().Debug().Str("data", format.ToPrettyJSON(network)).Msg("streaming network")
+		api.Logger().Debug().Str("id", network.ID).Msg("streaming network")
 		res <- network
 	}
 	return nil

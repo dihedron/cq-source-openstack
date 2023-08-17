@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
@@ -34,7 +34,7 @@ func fetchImageMetadata(ctx context.Context, meta schema.ClientMeta, parent *sch
 			Key:   k,
 			Value: v,
 		}
-		api.Logger.Debug().Str("image id", image.ID).Msg("streaming image metadata")
+		api.Logger().Debug().Str("image id", image.ID).Msg("streaming image metadata")
 		res <- pair
 	}
 

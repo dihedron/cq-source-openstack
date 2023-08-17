@@ -3,8 +3,9 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -25,7 +26,7 @@ func SecurityGroups() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "security_group_rule_ids",
-				Type:        schema.TypeStringArray,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The collection of IP addresses associated with the port.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("Rules.ID"),
@@ -42,7 +43,7 @@ func fetchSecurityGroups(ctx context.Context, meta schema.ClientMeta, parent *sc
 
 	neutron, err := api.GetServiceClient(client.NetworkV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -50,24 +51,24 @@ func fetchSecurityGroups(ctx context.Context, meta schema.ClientMeta, parent *sc
 
 	allPages, err := groups.List(neutron, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing security groups with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing security groups with options")
 		return err
 	}
 	allSecurityGroups, err := groups.ExtractGroups(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting security groups")
+		api.Logger().Error().Err(err).Msg("error extracting security groups")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allSecurityGroups)).Msg("security groups retrieved")
+	api.Logger().Debug().Int("count", len(allSecurityGroups)).Msg("security groups retrieved")
 
 	for _, group := range allSecurityGroups {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		group := group
-		// api.Logger.Debug().Str("data", format.ToPrettyJSON(group)).Msg("streaming security group")
-		api.Logger.Debug().Str("data", group.ID).Msg("streaming security group")
+		// api.Logger().Debug().Str("data", format.ToPrettyJSON(group)).Msg("streaming security group")
+		api.Logger().Debug().Str("data", group.ID).Msg("streaming security group")
 		res <- group
 	}
 	return nil

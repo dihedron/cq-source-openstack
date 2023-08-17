@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-source-openstack/client"
 
@@ -29,19 +30,19 @@ func Users() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "ignore_change_password_upon_first_use",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the password should not changed upon first use.",
 				Resolver:    schema.PathResolver("Options.IgnoreChangePasswordUponFirstUse"),
 			},
 			{
 				Name:        "ignore_lockout_failure_attempts",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the failure attempts should ignored.",
 				Resolver:    schema.PathResolver("Options.IgnoreLockoutFailureAttempts"),
 			},
 			{
 				Name:        "ignore_password_expiry",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the password expiry should be ignored.",
 				Resolver:    schema.PathResolver("Options.IgnorePasswordExpiry"),
 			},
@@ -55,42 +56,42 @@ func fetchUsers(ctx context.Context, meta schema.ClientMeta, parent *schema.Reso
 
 	keystone, err := api.GetServiceClient(client.IdentityV3)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
-	api.Logger.Debug().Msg("getting list of users...")
+	api.Logger().Debug().Msg("getting list of users...")
 
 	opts := users.ListOpts{}
 
 	allPages, err := users.List(keystone, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing users with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing users with options")
 		return err
 	}
 
-	api.Logger.Debug().Msg("list of users' pages retrieved...")
+	api.Logger().Debug().Msg("list of users' pages retrieved...")
 
 	allUsers := []*User{}
 	if err = ExtractUsersInto(allPages, &allUsers); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting users")
+		api.Logger().Error().Err(err).Msg("error extracting users")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allUsers)).Msg("instances retrieved")
+	api.Logger().Debug().Int("count", len(allUsers)).Msg("instances retrieved")
 
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting users")
+		api.Logger().Error().Err(err).Msg("error extracting users")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allUsers)).Msg("users retrieved")
+	api.Logger().Debug().Int("count", len(allUsers)).Msg("users retrieved")
 
 	for _, user := range allUsers {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		user := user
-		api.Logger.Debug().Str("user id", user.ID).Str("data", format.ToJSON(user)).Msg("streaming user")
+		api.Logger().Debug().Str("user id", user.ID).Str("data", format.ToJSON(user)).Msg("streaming user")
 		res <- user
 	}
 	return nil

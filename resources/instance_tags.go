@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 )
@@ -30,7 +30,7 @@ func fetchInstanceTags(ctx context.Context, meta schema.ClientMeta, parent *sche
 	if instance.Tags != nil {
 		for _, v := range *instance.Tags {
 			tag := &Tag{Value: v}
-			api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance tag")
+			api.Logger().Debug().Str("instance id", instance.ID).Msg("streaming instance tag")
 			res <- tag
 		}
 	}

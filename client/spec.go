@@ -20,3 +20,11 @@ type Spec struct {
 	BlockStorageV3Microversion *string `json:"blockstorage_v3_microversion,omitempty" yaml:"blockstorage_v3_microversion,omitempty"`
 	ImageServiceV2Microversion *string `json:"imageservice_v2_microversion,omitempty" yaml:"imageservice_v2_microversion,omitempty"`
 }
+
+func (s *Spec) Validate() error {
+	// TODO: implement
+	return nil
+}
+
+func (s *Spec) SetDefaults() {
+}

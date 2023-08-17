@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -37,7 +37,7 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 
 	nova, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -47,19 +47,19 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 
 	allPages, err := flavors.ListDetail(nova, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing flavors with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing flavors with options")
 		return err
 	}
 
 	allFlavors := []*Flavor{}
 	if err = ExtractFlavorsInto(allPages, &allFlavors); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting flavors")
+		api.Logger().Error().Err(err).Msg("error extracting flavors")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allFlavors)).Msg("flavors retrieved")
+	api.Logger().Debug().Int("count", len(allFlavors)).Msg("flavors retrieved")
 	for _, flavor := range allFlavors {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		flavor := flavor
@@ -67,20 +67,20 @@ func fetchFlavors(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 		// retrieve the extra specs
 		extraSpecs := flavors.ListExtraSpecs(nova, *flavor.ID)
 		if err != nil {
-			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error getting flavor extra specs")
+			api.Logger().Error().Err(err).Str("flavor id", *flavor.ID).Msg("error getting flavor extra specs")
 			return err
 		}
 		flavor.ExtraSpecsObj, err = ExtractFlavorsExtraSpecsAsObj(extraSpecs)
 		if err != nil {
-			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into object")
+			api.Logger().Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into object")
 			return err
 		}
 		flavor.ExtraSpecsMap, err = ExtractFlavorsExtraSpecsAsMap(extraSpecs)
 		if err != nil {
-			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into map")
+			api.Logger().Error().Err(err).Str("flavor id", *flavor.ID).Msg("error parsing flavor extra specs into map")
 			return err
 		}
-		api.Logger.Debug().Str("id", *flavor.ID).Msg("streaming flavor with extra specs")
+		api.Logger().Debug().Str("id", *flavor.ID).Msg("streaming flavor with extra specs")
 		res <- flavor
 	}
 	return nil

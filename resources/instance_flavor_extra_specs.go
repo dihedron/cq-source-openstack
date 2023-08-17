@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 )
@@ -36,7 +36,7 @@ func fetchInstanceFlavorExtraSpecs(ctx context.Context, meta schema.ClientMeta, 
 				Key:   k,
 				Value: v,
 			}
-			api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance flavor extra spec")
+			api.Logger().Debug().Str("instance id", instance.ID).Msg("streaming instance flavor extra spec")
 			res <- pair
 		}
 	}

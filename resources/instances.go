@@ -3,8 +3,9 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -33,7 +34,7 @@ func Instances() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "image_id",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The Glance image used to start the instance.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("Image"),
@@ -44,7 +45,7 @@ func Instances() *schema.Table {
 			},
 			{
 				Name:        "power_state_name",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The instance power state as a string.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("PowerState"),
@@ -68,7 +69,7 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 
 	nova, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -78,23 +79,23 @@ func fetchInstances(ctx context.Context, meta schema.ClientMeta, parent *schema.
 
 	allPages, err := servers.List(nova, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing instances with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing instances with options")
 		return err
 	}
 	allInstances := []*Instance{}
 	if err = servers.ExtractServersInto(allPages, &allInstances); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting instances")
+		api.Logger().Error().Err(err).Msg("error extracting instances")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allInstances)).Msg("instances retrieved")
+	api.Logger().Debug().Int("count", len(allInstances)).Msg("instances retrieved")
 
 	for _, instance := range allInstances {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		instance := instance
-		api.Logger.Debug().Str("id", instance.ID).Msg("streaming instance")
+		api.Logger().Debug().Str("id", instance.ID).Msg("streaming instance")
 		res <- instance
 	}
 	return nil

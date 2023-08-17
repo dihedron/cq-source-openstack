@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -35,7 +35,7 @@ func fetchHypervisors(ctx context.Context, meta schema.ClientMeta, parent *schem
 
 	compute, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -43,24 +43,24 @@ func fetchHypervisors(ctx context.Context, meta schema.ClientMeta, parent *schem
 
 	allPages, err := hypervisors.List(compute, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing hypervisors with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing hypervisors with options")
 		return err
 	}
 	allHypervisors, err := hypervisors.ExtractHypervisors(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting hypervisors")
+		api.Logger().Error().Err(err).Msg("error extracting hypervisors")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allHypervisors)).Msg("hypervisors retrieved")
+	api.Logger().Debug().Int("count", len(allHypervisors)).Msg("hypervisors retrieved")
 
 	for _, hypervisor := range allHypervisors {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		hypervisor := hypervisor
-		// api.Logger.Debug().Str("data", format.ToPrettyJSON(hypervisor)).Msg("streaming hypervisor")
-		api.Logger.Debug().Str("id", hypervisor.ID).Msg("streaming hypervisor")
+		// api.Logger().Debug().Str("data", format.ToPrettyJSON(hypervisor)).Msg("streaming hypervisor")
+		api.Logger().Debug().Str("id", hypervisor.ID).Msg("streaming hypervisor")
 		res <- hypervisor
 	}
 	return nil

@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 )
@@ -30,7 +30,7 @@ func fetchInstanceSecurityGroups(ctx context.Context, meta schema.ClientMeta, pa
 
 	//if instance.SecurityGroups != nil {
 	for _, group := range instance.SecurityGroups {
-		api.Logger.Debug().Str("instance id", instance.ID).Msg("streaming instance security group")
+		api.Logger().Debug().Str("instance id", instance.ID).Msg("streaming instance security group")
 		res <- SecurityGroup{
 			Name: group.Name,
 		}

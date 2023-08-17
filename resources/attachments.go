@@ -3,8 +3,9 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -29,7 +30,7 @@ func Attachments() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "attached_at",
-				Type:        schema.TypeTimestamp,
+				Type:        arrow.FixedWidthTypes.Timestamp_us,
 				Description: "The time at which the attachment was created.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("AttachedAt"),
@@ -38,7 +39,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "detached_at",
-				Type:        schema.TypeTimestamp,
+				Type:        arrow.FixedWidthTypes.Timestamp_us,
 				Description: "The time at which the attachment was removed.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("DetachedAt"),
@@ -47,7 +48,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "access_mode",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The access mode of the volume attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.AccessMode"),
@@ -56,7 +57,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "attach_mode",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The mode in which the volume is attached.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("AttachMode"),
@@ -65,7 +66,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "attachment_id",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The ID of the volume attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.AttachmentID"),
@@ -74,13 +75,13 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "auth_enabled",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the attachment authorisation is enabled.",
 				Resolver:    schema.PathResolver("ConnectionInfo.AuthEnabled"),
 			},
 			{
 				Name:        "auth_username",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The name of the user that attached the volume.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.AuthUsername"),
@@ -89,7 +90,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "cluster_name",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The name of the cluster.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.ClusterName"),
@@ -98,7 +99,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "discard",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "The name of the cluster.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Discard"),
@@ -106,7 +107,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "driver_volume_type",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The type of the driver.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.DriverVolumeType"),
@@ -115,7 +116,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "encrypted",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "Whether the volume is encrypted.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Encrypted"),
@@ -123,7 +124,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "hosts",
-				Type:        schema.TypeStringArray,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The storage hosts that hold the data in the volume.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Hosts"),
@@ -131,7 +132,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "keyring",
-				Type:        schema.TypeBool,
+				Type:        arrow.FixedWidthTypes.Boolean,
 				Description: "The keyring associated with the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Keyring"),
@@ -140,7 +141,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "name",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The name of the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Name"),
@@ -149,7 +150,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "ports",
-				Type:        schema.TypeStringArray,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.Ports"),
@@ -158,7 +159,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "secret_type",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.SecretType"),
@@ -167,7 +168,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "secret_uuid",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.SecretUUID"),
@@ -176,7 +177,7 @@ func Attachments() *schema.Table {
 			},
 			{
 				Name:        "volume_id",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The ports of the attachment.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("ConnectionInfo.VolumeID"),
@@ -194,26 +195,26 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 	// get list of all projects
 	keystone, err := api.GetServiceClient(client.IdentityV3)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving keystone client")
+		api.Logger().Error().Err(err).Msg("error retrieving keystone client")
 		return err
 	}
 
 	allPages, err := projects.List(keystone, &projects.ListOpts{}).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error listing projects")
+		api.Logger().Error().Err(err).Msg("error listing projects")
 		return err
 	}
 	allProjects, err := projects.ExtractProjects(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting projects")
+		api.Logger().Error().Err(err).Msg("error extracting projects")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allProjects)).Msg("projects retrieved")
+	api.Logger().Debug().Int("count", len(allProjects)).Msg("projects retrieved")
 
 	projectIDs := []string{}
 	for _, project := range allProjects {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		project := project
@@ -222,7 +223,7 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 
 	cinder, err := api.GetServiceClient(client.BlockStorageV3)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving cinder client")
+		api.Logger().Error().Err(err).Msg("error retrieving cinder client")
 		return err
 	}
 
@@ -235,26 +236,26 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 
 		allPages, err := attachments.List(cinder, opts).AllPages()
 		if err != nil {
-			api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing attachments with options")
+			api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing attachments with options")
 			return err
 		}
 		allAttachments := []*Attachment{}
 		err = attachments.ExtractAttachmentsInto(allPages, &allAttachments)
 		if err != nil {
-			api.Logger.Error().Err(err).Msg("error extracting attachments")
+			api.Logger().Error().Err(err).Msg("error extracting attachments")
 			return err
 		}
-		api.Logger.Debug().Str("project", projectID).Int("count", len(allAttachments)).Msg("attachments retrieved")
+		api.Logger().Debug().Str("project", projectID).Int("count", len(allAttachments)).Msg("attachments retrieved")
 
 		for _, attachment := range allAttachments {
 			if ctx.Err() != nil {
-				api.Logger.Debug().Msg("context done, exit")
+				api.Logger().Debug().Msg("context done, exit")
 				break
 			}
 			attachment := attachment
 			attachment.ProjectID = projectID
-			//api.Logger.Debug().Str("data", format.ToPrettyJSON(attachment)).Msg("streaming attachment")
-			api.Logger.Debug().Str("id", attachment.ID).Msg("streaming attachment")
+			//api.Logger().Debug().Str("data", format.ToPrettyJSON(attachment)).Msg("streaming attachment")
+			api.Logger().Debug().Str("id", attachment.ID).Msg("streaming attachment")
 			res <- attachment
 		}
 	}

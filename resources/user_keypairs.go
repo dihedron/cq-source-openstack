@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -34,7 +34,7 @@ func fetchUserKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *sche
 
 	compute, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -44,23 +44,23 @@ func fetchUserKeyPairs(ctx context.Context, meta schema.ClientMeta, parent *sche
 
 	allPages, err := keypairs.List(compute, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing keypairs with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing keypairs with options")
 		return err
 	}
 	allKeyPairs, err := keypairs.ExtractKeyPairs(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting keypairs")
+		api.Logger().Error().Err(err).Msg("error extracting keypairs")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allKeyPairs)).Msg("keypairs retrieved")
+	api.Logger().Debug().Int("count", len(allKeyPairs)).Msg("keypairs retrieved")
 
 	for _, keypair := range allKeyPairs {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		keypair.UserID = user.ID
-		api.Logger.Debug().Str("user id", keypair.UserID).Str("data", format.ToPrettyJSON(keypair)).Msg("streaming keypair")
+		api.Logger().Debug().Str("user id", keypair.UserID).Str("data", format.ToPrettyJSON(keypair)).Msg("streaming keypair")
 		res <- keypair
 	}
 	return nil

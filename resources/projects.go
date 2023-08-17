@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-source-openstack/client"
 
@@ -42,7 +42,7 @@ func fetchProjects(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 
 	keystone, err := api.GetServiceClient(client.IdentityV3)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -50,24 +50,24 @@ func fetchProjects(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 
 	allPages, err := projects.List(keystone, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing projects with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing projects with options")
 		return err
 	}
 	allProjects, err := projects.ExtractProjects(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting projects")
+		api.Logger().Error().Err(err).Msg("error extracting projects")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allProjects)).Msg("projects retrieved")
+	api.Logger().Debug().Int("count", len(allProjects)).Msg("projects retrieved")
 
 	for _, project := range allProjects {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		project := project
-		//api.Logger.Debug().Str("data", format.ToPrettyJSON(project)).Msg("streaming project")
-		api.Logger.Debug().Str("id", project.ID).Msg("streaming project")
+		//api.Logger().Debug().Str("data", format.ToPrettyJSON(project)).Msg("streaming project")
+		api.Logger().Debug().Str("id", project.ID).Msg("streaming project")
 		res <- project
 	}
 	return nil

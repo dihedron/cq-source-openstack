@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
@@ -35,7 +35,7 @@ func fetchImageProperties(ctx context.Context, meta schema.ClientMeta, parent *s
 			Key:   k,
 			Value: fmt.Sprintf("%v", v),
 		}
-		api.Logger.Debug().Str("image id", image.ID).Msg("streaming image property")
+		api.Logger().Debug().Str("image id", image.ID).Msg("streaming image property")
 		res <- pair
 	}
 

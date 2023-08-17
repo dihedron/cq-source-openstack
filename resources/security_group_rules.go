@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -42,7 +42,7 @@ func fetchSecurityGroupRules(ctx context.Context, meta schema.ClientMeta, parent
 
 	neutron, err := api.GetServiceClient(client.NetworkV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -50,24 +50,24 @@ func fetchSecurityGroupRules(ctx context.Context, meta schema.ClientMeta, parent
 
 	allPages, err := rules.List(neutron, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing security group rules with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing security group rules with options")
 		return err
 	}
 	allSecurityGroupRules, err := rules.ExtractRules(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting security group rules")
+		api.Logger().Error().Err(err).Msg("error extracting security group rules")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allSecurityGroupRules)).Msg("security group rules retrieved")
+	api.Logger().Debug().Int("count", len(allSecurityGroupRules)).Msg("security group rules retrieved")
 
 	for _, rule := range allSecurityGroupRules {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		rule := rule
-		// api.Logger.Debug().Str("data", format.ToPrettyJSON(rule)).Msg("streaming security group rules")
-		api.Logger.Debug().Str("id", rule.ID).Msg("streaming security group rule")
+		// api.Logger().Debug().Str("data", format.ToPrettyJSON(rule)).Msg("streaming security group rules")
+		api.Logger().Debug().Str("id", rule.ID).Msg("streaming security group rule")
 		res <- rule
 	}
 	return nil

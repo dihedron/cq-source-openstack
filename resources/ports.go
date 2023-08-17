@@ -3,8 +3,9 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/apache/arrow/go/v13/arrow"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -25,7 +26,7 @@ func Ports() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "ip_addresses",
-				Type:        schema.TypeStringArray,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The collection of IP addresses associated with the port.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("FixedIPs.IPAddress"),
@@ -34,7 +35,7 @@ func Ports() *schema.Table {
 			},
 			{
 				Name:        "ip_address",
-				Type:        schema.TypeString,
+				Type:        arrow.BinaryTypes.String,
 				Description: "The first IP address associated with the port.",
 				Resolver: transform.Apply(
 					transform.OnObjectField("FixedIPs.IPAddress"),
@@ -52,7 +53,7 @@ func fetchPorts(ctx context.Context, meta schema.ClientMeta, parent *schema.Reso
 
 	neutron, err := api.GetServiceClient(client.NetworkV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
@@ -60,24 +61,24 @@ func fetchPorts(ctx context.Context, meta schema.ClientMeta, parent *schema.Reso
 
 	allPages, err := ports.List(neutron, opts).AllPages()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing ports with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing ports with options")
 		return err
 	}
 	allPorts, err := ports.ExtractPorts(allPages)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting ports")
+		api.Logger().Error().Err(err).Msg("error extracting ports")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allPorts)).Msg("ports retrieved")
+	api.Logger().Debug().Int("count", len(allPorts)).Msg("ports retrieved")
 
 	for _, port := range allPorts {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		port := port
-		//api.Logger.Debug().Str("data", format.ToPrettyJSON(port)).Msg("streaming port")
-		api.Logger.Debug().Str("id", port.ID).Msg("streaming port")
+		//api.Logger().Debug().Str("data", format.ToPrettyJSON(port)).Msg("streaming port")
+		api.Logger().Debug().Str("id", port.ID).Msg("streaming port")
 		res <- port
 	}
 	return nil

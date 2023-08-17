@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/gophercloud/gophercloud"
@@ -31,38 +31,38 @@ func fetchFlavorAccesses(ctx context.Context, meta schema.ClientMeta, parent *sc
 
 	nova, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
 	flavor := parent.Item.(*Flavor)
-	api.Logger.Debug().Str("flavor id", *flavor.ID).Msg("retrieving accesses for flavor")
+	api.Logger().Debug().Str("flavor id", *flavor.ID).Msg("retrieving accesses for flavor")
 
 	allPages, err := flavors.ListAccesses(nova, *flavor.ID).AllPages()
 	if err != nil {
 		if _, ok := err.(gophercloud.ErrDefault404); ok {
-			api.Logger.Warn().Err(err).Str("flavor id", *flavor.ID).Msg("no flavor accesses for flavor")
+			api.Logger().Warn().Err(err).Str("flavor id", *flavor.ID).Msg("no flavor accesses for flavor")
 			return nil
 		} else {
-			api.Logger.Error().Err(err).Str("flavor id", *flavor.ID).Str("err type", fmt.Sprintf("%T", err)).Msg("error listing flavor accesses for flavor")
+			api.Logger().Error().Err(err).Str("flavor id", *flavor.ID).Str("err type", fmt.Sprintf("%T", err)).Msg("error listing flavor accesses for flavor")
 			return err
 		}
 	}
-	api.Logger.Debug().Msg("flavor accesses retrieved")
+	api.Logger().Debug().Msg("flavor accesses retrieved")
 
 	allAccesses := []*FlavorAccess{}
 	if err = ExtractFlavorAccessInto(allPages, &allAccesses); err != nil {
-		api.Logger.Error().Err(err).Msg("error extracting flavor accesses")
+		api.Logger().Error().Err(err).Msg("error extracting flavor accesses")
 		return err
 	}
-	api.Logger.Debug().Int("count", len(allAccesses)).Msg("flavors accesses retrieved")
+	api.Logger().Debug().Int("count", len(allAccesses)).Msg("flavors accesses retrieved")
 	for _, access := range allAccesses {
 		if ctx.Err() != nil {
-			api.Logger.Debug().Msg("context done, exit")
+			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
 		access := access
-		api.Logger.Debug().Str("flavor id", access.FlavorID).Str("project id", access.TenantID).Msg("streaming flavor access")
+		api.Logger().Debug().Str("flavor id", access.FlavorID).Str("project id", access.TenantID).Msg("streaming flavor access")
 		res <- access
 	}
 

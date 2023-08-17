@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/aggregates"
@@ -27,7 +27,7 @@ func fetchAggregateHosts(ctx context.Context, meta schema.ClientMeta, parent *sc
 	aggregate := parent.Item.(aggregates.Aggregate)
 	for _, v := range aggregate.Hosts {
 		host := &Single[string]{Name: v}
-		api.Logger.Debug().Int("aggregate id", aggregate.ID).Str("host", v).Msg("streaming aggregate host")
+		api.Logger().Debug().Int("aggregate id", aggregate.ID).Str("host", v).Msg("streaming aggregate host")
 		res <- host
 	}
 	return nil

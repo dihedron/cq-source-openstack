@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cloudquery/plugin-sdk/schema"
-	"github.com/cloudquery/plugin-sdk/transformers"
+	"github.com/cloudquery/plugin-sdk/v4/schema"
+	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -35,12 +35,12 @@ func fetchProjectLimits(ctx context.Context, meta schema.ClientMeta, parent *sch
 
 	compute, err := api.GetServiceClient(client.ComputeV2)
 	if err != nil {
-		api.Logger.Error().Err(err).Msg("error retrieving client")
+		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
 	}
 
 	if ctx.Err() != nil {
-		api.Logger.Debug().Msg("context done, exit")
+		api.Logger().Debug().Msg("context done, exit")
 		return errors.New("interrupted due to context done")
 	}
 
@@ -49,10 +49,10 @@ func fetchProjectLimits(ctx context.Context, meta schema.ClientMeta, parent *sch
 	}
 	allLimits, err := limits.Get(compute, opts).Extract()
 	if err != nil {
-		api.Logger.Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing limits with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing limits with options")
 		return err
 	}
-	api.Logger.Debug().Str("project id", project.ID).Msg("streaming project limits")
+	api.Logger().Debug().Str("project id", project.ID).Msg("streaming project limits")
 	res <- allLimits.Absolute
 	return nil
 }
