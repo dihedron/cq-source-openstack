@@ -1,6 +1,6 @@
 .PHONY: local
 local:
-	goreleaser build --single-target --snapshot --rm-dist
+	goreleaser build --single-target --snapshot --clean
 
 .PHONY: test
 test:

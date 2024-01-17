@@ -36,7 +36,7 @@ kind: destination
 spec:
   name: sqlite
   path: cloudquery/sqlite
-  version: v2.4.16
+  version: v2.4.21
   spec:
     connection_string: ./${OPENSTACK_INSTALLATION}.sqlite
 ---
@@ -45,7 +45,7 @@ spec:
   name: postgresql
   registry: github
   path: cloudquery/postgresql
-  version: v7.1.0
+  version: v7.1.6
   spec:
     connection_string: postgresql://cloudquery:cloudquery@localhost:15433/cloudquery?sslmode=disable    
 #    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable  
