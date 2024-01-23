@@ -11,7 +11,11 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/resources"
+	"github.com/dihedron/cq-source-openstack/resources/services/blockstorage"
+	"github.com/dihedron/cq-source-openstack/resources/services/compute"
+	"github.com/dihedron/cq-source-openstack/resources/services/identity"
+	"github.com/dihedron/cq-source-openstack/resources/services/image_service"
+	"github.com/dihedron/cq-source-openstack/resources/services/networking"
 	"github.com/rs/zerolog"
 )
 
@@ -76,20 +80,19 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables() schema.Tables {
 	tables := schema.Tables{
-		resources.Aggregates(),
-		resources.Attachments(),
-		resources.Flavors(),
-		resources.Hypervisors(),
-		resources.Instances(),
-		resources.Images(),
-		//resources.KeyPairs(),
-		resources.Networks(),
-		resources.Ports(),
-		resources.Projects(),
-		resources.SecurityGroups(),
-		resources.SecurityGroupRules(),
-		resources.Users(),
-		resources.Volumes(),
+		blockstorage.Attachments(),
+		blockstorage.Volumes(),
+		compute.Aggregates(),
+		compute.Flavors(),
+		compute.Hypervisors(),
+		compute.Instances(),
+		identity.Projects(),
+		identity.Users(),
+		image_service.Images(),
+		networking.Networks(),
+		networking.Ports(),
+		networking.SecurityGroups(),
+		networking.SecurityGroupRules(),
 	}
 	if err := transformers.TransformTables(tables); err != nil {
 		panic(err)

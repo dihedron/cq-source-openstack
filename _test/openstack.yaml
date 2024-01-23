@@ -2,7 +2,7 @@ kind: source
 spec:
   name: openstack_lab
   registry: local
-  path: "/data/workspaces/gomods/cq-source-openstack/dist/cq-source-openstack_linux_amd64_v1/cq-source-openstack"
+  path: "../dist/cq-source-openstack_linux_amd64_v1/cq-source-openstack"
   version: v1.0.0
   tables: 
     ["openstack*"]
