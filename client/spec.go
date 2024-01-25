@@ -14,6 +14,7 @@ type Spec struct {
 	AppCredentialID            *string `json:"app_credential_id,omitempty" yaml:"app_credential_id,omitempty"`
 	AppCredentialSecret        *string `json:"app_credential_secret,omitempty" yaml:"app_credential_secret,omitempty"`
 	AllowReauth                *bool   `json:"allow_reauth,omitempty" yaml:"allow_reauth,omitempty"`
+	BareMetalV1Microversion     *string `json:"baremetal_v1_microversion,omitempty" yaml:"baremetal_v1_microversion,omitempty"`
 	IdentityV3Microversion     *string `json:"identity_v3_microversion,omitempty" yaml:"identity_v3_microversion,omitempty"`
 	ComputeV2Microversion      *string `json:"compute_v2_microversion,omitempty" yaml:"compute_v2_microversion,omitempty"`
 	NetworkV2Microversion      *string `json:"network_v2_microversion,omitempty" yaml:"network_v2_microversion,omitempty"`

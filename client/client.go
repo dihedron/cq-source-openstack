@@ -142,6 +142,7 @@ func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient,
 
 const (
 	// defaults currently referring to Train
+	DefaultBareMetalV1Microversion	  = "1.53"
 	DefaultComputeV2Microversion      = "2.79"
 	DefaultIdentityV3Microversion     = "3.13"
 	DefaultBlockStorageV3Microversion = "3.59"
@@ -151,6 +152,8 @@ const (
 type ServiceType string
 
 const (
+	// BareMetalV1 identifies the OpenStack Baremetal V1 service (Ironic).
+	BareMetalV1 = "openstack_baremetal_v1"
 	// IdentityV3 identifies the OpenStack Identity V3 service (Keystone).
 	IdentityV3 ServiceType = "openstack_identity_v3"
 	// Compute identifies the penStack Compute V2 service (Nova).
@@ -169,6 +172,16 @@ type serviceConfig struct {
 }
 
 var serviceConfigMap = map[ServiceType]serviceConfig{
+	BareMetalV1: {
+		newClient: openstack.NewBareMetalV1,
+		getMicroversion: func(spec *Spec) string {
+			microversion := DefaultBareMetalV1Microversion
+			if spec.BareMetalV1Microversion != nil {
+				microversion = *spec.BareMetalV1Microversion
+			}
+			return microversion
+		},
+	},
 	IdentityV3: {
 		newClient: openstack.NewIdentityV3,
 		getMicroversion: func(spec *Spec) string {
