@@ -30,30 +30,13 @@ func fetchSnapshots(ctx context.Context, meta schema.ClientMeta, parent *schema.
 		return err
 	}
 
-	// opts := snapshots.ListOpts{
-	// 	AllTenants: true,
-	// }
-
-	// allPages, err := snapshots.List(cinder, opts).AllPages()
-	// if err != nil{
-	// 	panic(err)
-	// }
-	// snapshots, err := snapshots.ExtractSnapshots(allPages)
-	// if err != nil{
-	// 	panic(err)
-	// }
-	// for _, snapshot := range snapshots{
-	// 	res <- snapshot
-	// }
-	// return nil
-
 	opts := snapshots.ListOpts{
 		AllTenants: true,
 	}
 
 	allPages, err := snapshots.List(cinder, opts).AllPages()
 	if err != nil {
-		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing volumes with options")
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing snapshots with options")
 		return err
 	}
 	allSnapshots, err := snapshots.ExtractSnapshots(allPages)
