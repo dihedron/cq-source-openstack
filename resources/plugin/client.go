@@ -11,6 +11,7 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-source-openstack/client"
+
 	"github.com/dihedron/cq-source-openstack/resources/services/baremetal"
 	"github.com/dihedron/cq-source-openstack/resources/services/blockstorage"
 	"github.com/dihedron/cq-source-openstack/resources/services/compute"
@@ -81,7 +82,10 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables() schema.Tables {
 	tables := schema.Tables{
-		baremetal.Drivers(),
+		// baremetal.Drivers(),
+		// baremetal.Allocations(),
+		baremetal.Nodes(),
+		baremetal.Ports(),
 		blockstorage.Attachments(),
 		blockstorage.Snapshots(),
 		blockstorage.Volumes(),
