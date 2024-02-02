@@ -10,10 +10,10 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v3/qos"
 )
 
-func QoSs() *schema.Table {
+func QoS() *schema.Table {
 	return &schema.Table{
 		Name:     "openstack_qos",
-		Resolver: fetchQoSs,
+		Resolver: fetchQoS,
 		Transform: transformers.TransformWithStruct(
 			&qos.QoS{},
 			transformers.WithPrimaryKeys("ID"),
@@ -21,7 +21,7 @@ func QoSs() *schema.Table {
 	}
 }
 
-func fetchQoSs(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
+func fetchQoS(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
 	api := meta.(*client.Client)
 
 	cinder, err := api.GetServiceClient(client.BlockStorageV3)

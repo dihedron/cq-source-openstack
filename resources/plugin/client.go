@@ -82,11 +82,15 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables() schema.Tables {
 	tables := schema.Tables{
-		// baremetal.Drivers(),
-		// baremetal.Allocations(),
+		baremetal.Allocations(),
+		baremetal.Drivers(),
 		baremetal.Nodes(),
 		baremetal.Ports(),
 		blockstorage.Attachments(),
+		blockstorage.AvailabilityZones(),
+		blockstorage.Backups(),
+		blockstorage.Limits(),
+		blockstorage.QoS(),
 		blockstorage.Snapshots(),
 		blockstorage.Volumes(),
 		compute.Aggregates(),
