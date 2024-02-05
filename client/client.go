@@ -142,7 +142,7 @@ func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient,
 
 const (
 	// defaults currently referring to Train
-	DefaultBareMetalV1Microversion	  = "1.53"
+	DefaultBareMetalV1Microversion	  = "1.58"
 	DefaultComputeV2Microversion      = "2.79"
 	DefaultIdentityV3Microversion     = "3.13"
 	DefaultBlockStorageV3Microversion = "3.59"
