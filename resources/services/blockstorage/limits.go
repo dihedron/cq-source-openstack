@@ -3,6 +3,7 @@ package blockstorage
 import (
 	"context"
 
+	"github.com/apache/arrow/go/v13/arrow"
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-source-openstack/client"
@@ -14,8 +15,113 @@ func Limits() *schema.Table {
 		Name:     "openstack_limits",
 		Resolver: fetchLimits,
 		Transform: transformers.TransformWithStruct(
-			&limits.Limits{},
+			&Limit{},
+			transformers.WithSkipFields("Absolute", "Rate"),
 		),
+		Columns: []schema.Column{
+			{
+				Name:        "max_total_volumes",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The maximum number of volumes that can be created.",
+				Resolver:    schema.PathResolver("Absolute.MaxTotalVolumes"),
+			},
+			{
+				Name:        "max_total_snapshots",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The maximum number of snapshots that can be created.",
+				Resolver:    schema.PathResolver("Absolute.MaxTotalSnapshots"),
+			},
+			{
+				Name:        "max_total_volume_gigabytes",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The maximum number of gigabytes that can be used for volumes.",
+				Resolver:    schema.PathResolver("Absolute.MaxTotalVolumeGigabytes"),
+			},
+			{
+				Name:        "max_total_backups",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The maximum number of backups that can be created.",
+				Resolver:    schema.PathResolver("Absolute.MaxTotalBackups"),
+			},
+			{
+				Name:        "max_total_backup_gigabytes",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The maximum number of gigabytes that can be used for backups.",
+				Resolver:    schema.PathResolver("Absolute.MaxTotalBackupGigabytes"),
+			},
+			{
+				Name:        "total_volumes_used",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of volumes that have been created.",
+				Resolver:    schema.PathResolver("Absolute.TotalVolumesUsed"),
+			},
+			{
+				Name:        "total_gigabytes_used",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of gigabytes that have been used for volumes.",
+				Resolver:    schema.PathResolver("Absolute.TotalGigabytesUsed"),
+			},
+			{
+				Name:        "total_snapshots_used",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of snapshots that have been created.",
+				Resolver:    schema.PathResolver("Absolute.TotalSnapshotsUsed"),
+			},
+			{
+				Name:        "total_backups_used",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of backups that have been created.",
+				Resolver:    schema.PathResolver("Absolute.TotalBackupsUsed"),
+			},
+			{
+				Name:        "total_backup_gigabytes_used",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of gigabytes that have been used for backups.",
+				Resolver:    schema.PathResolver("Absolute.TotalBackupGigabytesUsed"),
+			},
+			{
+				Name:        "regex",
+				Type:        arrow.BinaryTypes.String,
+				Description: "The regular expression used to match the URI.",
+				Resolver:    schema.PathResolver("Rate.Regex"),
+			},
+			{
+				Name:        "uri",
+				Type:        arrow.BinaryTypes.String,
+				Description: "The URI that the regular expression matches.",
+				Resolver:    schema.PathResolver("Rate.URI"),
+			},
+			{
+				Name:        "verb",
+				Type:        arrow.BinaryTypes.String,
+				Description: "The HTTP verb used to match the URI.",
+				Resolver:    schema.PathResolver("Rate.Limit.Verb"),
+			},
+			{
+				Name:        "next_available",
+				Type:        arrow.BinaryTypes.String,
+				Description: "The next available time for the rate limit.",
+				Resolver:    schema.PathResolver("Rate.Limit.NextAvailable"),
+			},
+			{
+				Name:        "unit",
+				Type:        arrow.BinaryTypes.String,
+				Description: "The unit of the rate limit.",
+				Resolver:    schema.PathResolver("Rate.Limit.Unit"),
+			},
+			{
+				Name:        "value",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The value of the rate limit.",
+				Resolver:    schema.PathResolver("Rate.Limit.Value"),
+			},
+			{
+				Name:        "remaining",
+				Type:        arrow.PrimitiveTypes.Int64,
+				Description: "The number of requests remaining in the current rate limit window.",
+				Resolver:    schema.PathResolver("Rate.Limit.Remaining"),
+			},
+		},
 	}
 }
 
@@ -36,4 +142,30 @@ func fetchLimits(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 
 	res <- allLimits
 	return nil
+}
+
+type Limit struct {
+	Absolute struct {
+		MaxTotalVolumes          int `json:"maxTotalVolumes"`
+		MaxTotalSnapshots        int `json:"maxTotalSnapshots"`
+		MaxTotalVolumeGigabytes  int `json:"maxTotalVolumeGigabytes"`
+		MaxTotalBackups          int `json:"maxTotalBackups"`
+		MaxTotalBackupGigabytes  int `json:"maxTotalBackupGigabytes"`
+		TotalVolumesUsed         int `json:"totalVolumesUsed"`
+		TotalGigabytesUsed       int `json:"totalGigabytesUsed"`
+		TotalSnapshotsUsed       int `json:"totalSnapshotsUsed"`
+		TotalBackupsUsed         int `json:"totalBackupsUsed"`
+		TotalBackupGigabytesUsed int `json:"totalBackupGigabytesUsed"`
+	} `json:"absolute"`
+	Rate struct {
+		Regex string         `json:"regex"`
+		URI   string         `json:"uri"`
+		Limit struct {
+			Verb          string `json:"verb"`
+			NextAvailable string `json:"next-available"`
+			Unit          string `json:"unit"`
+			Value         int    `json:"value"`
+			Remaining     int    `json:"remaining"`
+		} `json:"limit"`
+	} `json:"rate"`
 }
