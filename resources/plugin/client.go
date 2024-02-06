@@ -12,7 +12,7 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-source-openstack/client"
 
-	"github.com/dihedron/cq-source-openstack/resources/services/baremetal"
+	// "github.com/dihedron/cq-source-openstack/resources/services/baremetal"
 	"github.com/dihedron/cq-source-openstack/resources/services/blockstorage"
 	"github.com/dihedron/cq-source-openstack/resources/services/compute"
 	"github.com/dihedron/cq-source-openstack/resources/services/identity"
@@ -99,6 +99,7 @@ func getTables() schema.Tables {
 		compute.Images(),
 		compute.Instances(),
 		compute.Limits(),
+		compute.Networks(),
 		identity.Projects(),
 		identity.Users(),
 		image_service.Images(),
