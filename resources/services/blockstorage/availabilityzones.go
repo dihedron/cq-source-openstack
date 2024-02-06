@@ -11,7 +11,7 @@ import (
 
 func AvailabilityZones() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_availabilityzones",
+		Name:     "openstack_blockstorage_availabilityzones",
 		Resolver: fetchAvailabilityZones,
 		Transform: transformers.TransformWithStruct(
 			&availabilityzones.AvailabilityZone{},

@@ -15,7 +15,7 @@ import (
 
 func InstanceFlavors() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_flavors",
+		Name:     "openstack_compute_instance_flavors",
 		Resolver: fetchInstanceFlavors,
 		Transform: transformers.TransformWithStruct(
 			&InstanceFlavor{},

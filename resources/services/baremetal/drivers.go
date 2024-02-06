@@ -12,7 +12,7 @@ import (
 
 func Drivers() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_drivers",
+		Name:     "openstack_baremetal_drivers",
 		Resolver: fetchDriver,
 		Transform: transformers.TransformWithStruct(
 			&drivers.Driver{},

@@ -13,7 +13,7 @@ import (
 
 func NetworkTags() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_network_tags",
+		Name:     "openstack_networking_network_tags",
 		Resolver: fetchNetworkTags,
 		Transform: transformers.TransformWithStruct(
 			&utils.Tag{},

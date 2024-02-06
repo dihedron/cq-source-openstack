@@ -14,7 +14,7 @@ import (
 
 func Networks() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_networks",
+		Name:     "openstack_networking_networks",
 		Resolver: fetchNetworks,
 		Transform: transformers.TransformWithStruct(
 			&Network{},

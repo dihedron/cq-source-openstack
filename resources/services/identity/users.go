@@ -18,7 +18,7 @@ import (
 
 func Users() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_users",
+		Name:     "openstack_identity_users",
 		Resolver: fetchUsers,
 		Transform: transformers.TransformWithStruct(
 			&User{},

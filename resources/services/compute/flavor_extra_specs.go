@@ -12,7 +12,7 @@ import (
 
 func FlavorExtraSpecs() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_flavor_extra_specs",
+		Name:     "openstack_compute_flavor_extra_specs",
 		Resolver: fetchFlavorExtraSpecs,
 		Transform: transformers.TransformWithStruct(
 			&utils.Pair[string, string]{},

@@ -13,7 +13,7 @@ import (
 
 func NetworkSubnets() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_network_subnets",
+		Name:     "openstack_networking_network_subnets",
 		Resolver: fetchNetworkSubnets,
 		Transform: transformers.TransformWithStruct(
 			&utils.Single[string]{},

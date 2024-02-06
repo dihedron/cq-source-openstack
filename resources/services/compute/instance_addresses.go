@@ -12,7 +12,7 @@ import (
 
 func InstanceAddresses() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_addresses",
+		Name:     "openstack_compute_instance_addresses",
 		Resolver: fetchInstanceAddresses,
 		Transform: transformers.TransformWithStruct(
 			&Address{},

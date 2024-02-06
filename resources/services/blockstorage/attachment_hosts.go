@@ -11,7 +11,7 @@ import (
 
 func AttachmentHosts() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_attachment_hosts",
+		Name:     "openstack_blockstorage_attachment_hosts",
 		Resolver: fetchAttachmentHosts,
 		Transform: transformers.TransformWithStruct(
 			&Host{},

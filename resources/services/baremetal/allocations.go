@@ -12,7 +12,7 @@ import (
 
 func Allocations() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_allocations",
+		Name:     "openstack_baremetal_allocations",
 		Resolver: fetchAllocation,
 		Transform: transformers.TransformWithStruct(
 			&allocations.Allocation{},

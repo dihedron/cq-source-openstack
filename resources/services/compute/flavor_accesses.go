@@ -15,7 +15,7 @@ import (
 
 func FlavorAccesses() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_flavor_accesses",
+		Name:     "openstack_compute_flavor_accesses",
 		Resolver: fetchFlavorAccesses,
 		Transform: transformers.TransformWithStruct(
 			&FlavorAccess{},

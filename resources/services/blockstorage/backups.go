@@ -11,7 +11,7 @@ import (
 
 func Backups() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_backups",
+		Name:     "openstack_blockstorage_backups",
 		Resolver: fetchBackups,
 		Transform: transformers.TransformWithStruct(
 			&backups.Backup{},

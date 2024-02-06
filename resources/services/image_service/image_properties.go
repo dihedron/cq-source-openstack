@@ -14,7 +14,7 @@ import (
 
 func ImageProperties() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_image_properties",
+		Name:     "openstack_imageservice_image_properties",
 		Resolver: fetchImageProperties,
 		Transform: transformers.TransformWithStruct(
 			&utils.Pair[string, string]{},

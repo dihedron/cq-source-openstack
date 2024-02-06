@@ -12,7 +12,7 @@ import (
 
 func QoS() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_qos",
+		Name:     "openstack_blockstorage_qos",
 		Resolver: fetchQoS,
 		Transform: transformers.TransformWithStruct(
 			&qos.QoS{},

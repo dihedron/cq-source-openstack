@@ -13,7 +13,7 @@ import (
 
 func SecurityGroupRules() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_security_group_rules",
+		Name:     "openstack_networking_security_group_rules",
 		Resolver: fetchSecurityGroupRules,
 		Transform: transformers.TransformWithStruct(
 			&rules.SecGroupRule{},

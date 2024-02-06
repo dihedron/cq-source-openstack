@@ -12,7 +12,7 @@ import (
 
 func Limits() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_limits",
+		Name:     "openstack_blockstorage_limits",
 		Resolver: fetchLimits,
 		Transform: transformers.TransformWithStruct(
 			&Limit{},

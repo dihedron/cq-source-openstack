@@ -12,7 +12,7 @@ import (
 
 func Nodes() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_nodes",
+		Name:     "openstack_baremetal_nodes",
 		Resolver: fetchNode,
 		Transform: transformers.TransformWithStruct(
 			&nodes.Node{},

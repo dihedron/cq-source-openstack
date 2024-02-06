@@ -13,7 +13,7 @@ import (
 
 func Images() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_images",
+		Name:     "openstack_imageservice_images",
 		Resolver: fetchImages,
 		Transform: transformers.TransformWithStruct(
 			&images.Image{},

@@ -12,7 +12,7 @@ import (
 
 func InstanceAttachedVolumes() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_attached_volumes",
+		Name:     "openstack_compute_instance_attached_volumes",
 		Resolver: fetchInstanceAttachedVolumes,
 		Transform: transformers.TransformWithStruct(
 			&servers.AttachedVolume{},

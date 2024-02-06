@@ -12,7 +12,7 @@ import (
 
 func Snapshots() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_snapshots",
+		Name:     "openstack_blockstorage_snapshots",
 		Resolver: fetchSnapshots,
 		Transform: transformers.TransformWithStruct(
 			&snapshots.Snapshot{},

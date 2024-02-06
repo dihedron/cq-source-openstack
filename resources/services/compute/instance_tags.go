@@ -13,7 +13,7 @@ import (
 
 func InstanceTags() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_tags",
+		Name:     "openstack_compute_instance_tags",
 		Resolver: fetchInstanceTags,
 		Transform: transformers.TransformWithStruct(
 			&utils.Tag{},

@@ -13,7 +13,7 @@ import (
 
 func ImageMetadata() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_image_metadata",
+		Name:     "openstack_imageservice_image_metadata",
 		Resolver: fetchImageMetadata,
 		Transform: transformers.TransformWithStruct(
 			&utils.Pair[string, string]{},

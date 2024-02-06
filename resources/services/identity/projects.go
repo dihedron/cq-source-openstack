@@ -13,7 +13,7 @@ import (
 
 func Projects() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_projects",
+		Name:     "openstack_identity_projects",
 		Resolver: fetchProjects,
 		Transform: transformers.TransformWithStruct(
 			&projects.Project{},

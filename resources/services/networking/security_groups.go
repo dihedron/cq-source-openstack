@@ -14,7 +14,7 @@ import (
 
 func SecurityGroups() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_security_groups",
+		Name:     "openstack_networking_security_groups",
 		Resolver: fetchSecurityGroups,
 		Transform: transformers.TransformWithStruct(
 			&groups.SecGroup{},

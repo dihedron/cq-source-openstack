@@ -16,7 +16,7 @@ import (
 
 func Instances() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instances",
+		Name:     "openstack_compute_instances",
 		Resolver: fetchInstances,
 		Transform: transformers.TransformWithStruct(
 			&Instance{},

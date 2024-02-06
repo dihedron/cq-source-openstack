@@ -14,7 +14,7 @@ import (
 
 func AggregateHosts() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_aggregate_hosts",
+		Name:     "openstack_compute_aggregate_hosts",
 		Resolver: fetchAggregateHosts,
 		Transform: transformers.TransformWithStruct(
 			&utils.Single[string]{},

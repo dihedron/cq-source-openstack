@@ -17,7 +17,7 @@ import (
 
 func Attachments() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_attachments",
+		Name:     "openstack_blockstorage_attachments",
 		Resolver: fetchAttachments,
 		Transform: transformers.TransformWithStruct(
 			&Attachment{},

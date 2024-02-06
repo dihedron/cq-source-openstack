@@ -12,7 +12,7 @@ import (
 
 func InstanceMetadata() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_metadata",
+		Name:     "openstack_compute_instance_metadata",
 		Resolver: fetchInstanceMetadata,
 		Transform: transformers.TransformWithStruct(
 			&utils.Pair[string, string]{},

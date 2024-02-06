@@ -12,7 +12,7 @@ import (
 
 func Aggregates() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_aggregates",
+		Name:     "openstack_compute_aggregates",
 		Resolver: fetchAggregates,
 		Transform: transformers.TransformWithStruct(
 			&aggregates.Aggregate{},

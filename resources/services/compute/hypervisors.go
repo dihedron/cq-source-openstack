@@ -13,7 +13,7 @@ import (
 
 func Hypervisors() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_hypervisors",
+		Name:     "openstack_compute_hypervisors",
 		Resolver: fetchHypervisors,
 		Transform: transformers.TransformWithStruct(
 			&hypervisors.Hypervisor{},

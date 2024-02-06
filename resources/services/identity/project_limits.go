@@ -15,7 +15,7 @@ import (
 
 func ProjectLimits() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_project_limits",
+		Name:     "openstack_identity_project_limits",
 		Resolver: fetchProjectLimits,
 		Transform: transformers.TransformWithStruct(
 			&limits.Absolute{},

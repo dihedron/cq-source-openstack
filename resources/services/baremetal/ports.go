@@ -14,7 +14,7 @@ import (
 
 func Ports() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_ports",
+		Name:     "openstack_baremetal_ports",
 		Resolver: fetchPort,
 		Transform: transformers.TransformWithStruct(
 			&Port{},

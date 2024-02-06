@@ -14,7 +14,7 @@ import (
 
 func ImageTags() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_image_tags",
+		Name:     "openstack_imageservice_image_tags",
 		Resolver: fetchImageTags,
 		Transform: transformers.TransformWithStruct(
 			&utils.Tag{},

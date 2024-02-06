@@ -96,6 +96,7 @@ func getTables() schema.Tables {
 		compute.Aggregates(),
 		compute.Flavors(),
 		compute.Hypervisors(),
+		compute.Images(),
 		compute.Instances(),
 		identity.Projects(),
 		identity.Users(),

@@ -11,7 +11,7 @@ import (
 
 func InstanceSecurityGroups() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_instance_security_groups",
+		Name:     "openstack_compute_instance_security_groups",
 		Resolver: fetchInstanceSecurityGroups,
 		Transform: transformers.TransformWithStruct(
 			&SecurityGroup{},

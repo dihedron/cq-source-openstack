@@ -14,7 +14,7 @@ import (
 
 func UserKeyPairs() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_user_keypairs",
+		Name:     "openstack_identity_user_keypairs",
 		Resolver: fetchUserKeyPairs,
 		Transform: transformers.TransformWithStruct(
 			&keypairs.KeyPair{},

@@ -16,7 +16,7 @@ import (
 
 func Volumes() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_volumes",
+		Name:     "openstack_blockstorage_volumes",
 		Resolver: fetchVolumes,
 		Transform: transformers.TransformWithStruct(
 			&Volume{},
