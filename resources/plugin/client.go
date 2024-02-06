@@ -82,10 +82,10 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables() schema.Tables {
 	tables := schema.Tables{
-		baremetal.Allocations(),
-		baremetal.Drivers(),
-		baremetal.Nodes(),
-		baremetal.Ports(),
+		// baremetal.Allocations(),
+		// baremetal.Drivers(),
+		// baremetal.Nodes(),
+		// baremetal.Ports(),
 		blockstorage.Attachments(),
 		blockstorage.AvailabilityZones(),
 		blockstorage.Backups(),
@@ -98,6 +98,7 @@ func getTables() schema.Tables {
 		compute.Hypervisors(),
 		compute.Images(),
 		compute.Instances(),
+		compute.Limits(),
 		identity.Projects(),
 		identity.Users(),
 		image_service.Images(),
