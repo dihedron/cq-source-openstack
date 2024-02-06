@@ -39,7 +39,7 @@ func fetchDriver(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 	}
 
 	allDrivers, err := drivers.ExtractDrivers(allPages)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	for _, driver := range allDrivers {

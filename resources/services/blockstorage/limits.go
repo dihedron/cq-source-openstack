@@ -158,8 +158,8 @@ type Limit struct {
 		TotalBackupGigabytesUsed int `json:"totalBackupGigabytesUsed"`
 	} `json:"absolute"`
 	Rate struct {
-		Regex string         `json:"regex"`
-		URI   string         `json:"uri"`
+		Regex string `json:"regex"`
+		URI   string `json:"uri"`
 		Limit struct {
 			Verb          string `json:"verb"`
 			NextAvailable string `json:"next-available"`

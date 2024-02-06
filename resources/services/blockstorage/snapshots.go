@@ -40,7 +40,7 @@ func fetchSnapshots(ctx context.Context, meta schema.ClientMeta, parent *schema.
 		return err
 	}
 	allSnapshots, err := snapshots.ExtractSnapshots(allPages)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	for _, snapshot := range allSnapshots {

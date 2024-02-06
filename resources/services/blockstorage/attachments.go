@@ -265,15 +265,15 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 }
 
 type Attachment struct {
-	ID             string `json:"id"`
-	AttachedAt     utils.Time   `json:"attached_at"`
-	DetachedAt     utils.Time   `json:"detached_at"`
-	AttachmentID   string `json:"attachment_id"`
-	VolumeID       string `json:"volume_id"`
-	Instance       string `json:"instance" cq-name:"instance_id"`
-	Status         string `json:"status"`
-	AttachMode     string `json:"attach_mode"`
-	ProjectID      string `json:"-" cq-name:"project_id"`
+	ID             string     `json:"id"`
+	AttachedAt     utils.Time `json:"attached_at"`
+	DetachedAt     utils.Time `json:"detached_at"`
+	AttachmentID   string     `json:"attachment_id"`
+	VolumeID       string     `json:"volume_id"`
+	Instance       string     `json:"instance" cq-name:"instance_id"`
+	Status         string     `json:"status"`
+	AttachMode     string     `json:"attach_mode"`
+	ProjectID      string     `json:"-" cq-name:"project_id"`
 	ConnectionInfo struct {
 		AccessMode       string   `json:"access_mode"`
 		AttachmentID     string   `json:"attachment_id"`

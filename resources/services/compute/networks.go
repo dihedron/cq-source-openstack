@@ -20,7 +20,7 @@ func Networks() *schema.Table {
 }
 
 func fetchNetworks(ctx context.Context, meta schema.ClientMeta, parent *schema.Resource, res chan<- interface{}) error {
-	
+
 	api := meta.(*client.Client)
 
 	nova, err := api.GetServiceClient(client.ComputeV2)
