@@ -15,7 +15,7 @@ func Limits() *schema.Table {
 		Name:     "openstack_blockstorage_limits",
 		Resolver: fetchLimits,
 		Transform: transformers.TransformWithStruct(
-			&limits.Limits{},
+			&limits.Limit{},
 			transformers.WithSkipFields("Absolute", "Rate"),
 		),
 		Columns: []schema.Column{
@@ -93,31 +93,31 @@ func Limits() *schema.Table {
 			},
 			{
 				Name:        "verb",
-				Type:        arrow.ListOf(arrow.BinaryTypes.String),
+				Type:        arrow.ListOf(arrow.ListOf(arrow.BinaryTypes.String)),
 				Description: "The HTTP verb used to match the URI.",
 				Resolver:    schema.PathResolver("Rate.Limit.Verb"),
 			},
 			{
 				Name:        "next_available",
-				Type:        arrow.ListOf(arrow.BinaryTypes.String),
+				Type:        arrow.ListOf(arrow.ListOf(arrow.BinaryTypes.String)),
 				Description: "The next available time for the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.NextAvailable"),
 			},
 			{
 				Name:        "unit",
-				Type:        arrow.ListOf(arrow.BinaryTypes.String),
+				Type:        arrow.ListOf(arrow.ListOf(arrow.BinaryTypes.String)),
 				Description: "The unit of the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.Unit"),
 			},
 			{
 				Name:        "value",
-				Type:        arrow.ListOf(arrow.PrimitiveTypes.Int64),
+				Type:        arrow.ListOf(arrow.ListOf(arrow.PrimitiveTypes.Int64)),
 				Description: "The value of the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.Value"),
 			},
 			{
 				Name:        "remaining",
-				Type:        arrow.ListOf(arrow.PrimitiveTypes.Int64),
+				Type:        arrow.ListOf(arrow.ListOf(arrow.PrimitiveTypes.Int64)),
 				Description: "The number of requests remaining in the current rate limit window.",
 				Resolver:    schema.PathResolver("Rate.Limit.Remaining"),
 			},
@@ -142,30 +142,4 @@ func fetchLimits(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 
 	res <- allLimits
 	return nil
-}
-
-type Limit struct {
-	Absolute struct {
-		MaxTotalVolumes          int `json:"maxTotalVolumes"`
-		MaxTotalSnapshots        int `json:"maxTotalSnapshots"`
-		MaxTotalVolumeGigabytes  int `json:"maxTotalVolumeGigabytes"`
-		MaxTotalBackups          int `json:"maxTotalBackups"`
-		MaxTotalBackupGigabytes  int `json:"maxTotalBackupGigabytes"`
-		TotalVolumesUsed         int `json:"totalVolumesUsed"`
-		TotalGigabytesUsed       int `json:"totalGigabytesUsed"`
-		TotalSnapshotsUsed       int `json:"totalSnapshotsUsed"`
-		TotalBackupsUsed         int `json:"totalBackupsUsed"`
-		TotalBackupGigabytesUsed int `json:"totalBackupGigabytesUsed"`
-	} `json:"absolute"`
-	Rate []struct {
-		Regex string `json:"regex"`
-		URI   string `json:"uri"`
-		Limit struct {
-			Verb          string `json:"verb"`
-			NextAvailable string `json:"next-available"`
-			Unit          string `json:"unit"`
-			Value         int    `json:"value"`
-			Remaining     int    `json:"remaining"`
-		} `json:"limit"`
-	} `json:"rate"`
 }
