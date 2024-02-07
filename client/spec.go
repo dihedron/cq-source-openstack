@@ -1,5 +1,12 @@
 package client
 
+import (
+	"net/http"
+	"net/url"
+
+	"github.com/rs/zerolog/log"
+)
+
 type Spec struct {
 	EndpointUrl                *string `json:"endpoint_url,omitempty" yaml:"endpoint_url,omitempty"`
 	UserID                     *string `json:"userid,omitempty" yaml:"userid,omitempty"`
@@ -23,7 +30,18 @@ type Spec struct {
 }
 
 func (s *Spec) Validate() error {
-	// TODO: implement
+	// Check that the endpoint URL is a valid URL
+	_ , err := url.ParseRequestURI(*s.EndpointUrl)
+	if err != nil {
+		log.Error().Err(err).Msg("invalid endpoint URL")
+		return err
+	}
+	// Check the the endpoint URL is reachable
+	_, err = http.Get(*s.EndpointUrl)
+	if err != nil {
+		log.Error().Err(err).Msg("endpoint URL is unreachable")
+		return err
+	}
 	return nil
 }
 

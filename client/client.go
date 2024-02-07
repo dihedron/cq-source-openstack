@@ -33,6 +33,12 @@ func New(ctx context.Context, logger zerolog.Logger, spec *Spec) (*Client, error
 
 	logger.Debug().Str("spec", format.ToJSON(spec)).Msg("plugin configuration")
 
+	err := spec.Validate()
+	if err != nil {
+		logger.Error().Err(err).Msg("invalid spec configuration")
+		return nil, fmt.Errorf("error spec not valid: %w", err)
+	}
+
 	auth := gophercloud.AuthOptions{
 		AllowReauth: true,
 	}
