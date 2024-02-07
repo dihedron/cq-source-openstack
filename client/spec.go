@@ -36,7 +36,7 @@ func (s *Spec) Validate() error {
 		log.Error().Err(err).Msg("invalid endpoint URL")
 		return err
 	}
-	// Check the the endpoint URL is reachable
+	// Check that the endpoint URL is reachable
 	_, err = http.Get(*s.EndpointUrl)
 	if err != nil {
 		log.Error().Err(err).Msg("endpoint URL is unreachable")

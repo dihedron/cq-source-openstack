@@ -15,7 +15,7 @@ func Limits() *schema.Table {
 		Name:     "openstack_blockstorage_limits",
 		Resolver: fetchLimits,
 		Transform: transformers.TransformWithStruct(
-			&Limit{},
+			&limits.Limits{},
 			transformers.WithSkipFields("Absolute", "Rate"),
 		),
 		Columns: []schema.Column{
@@ -81,43 +81,43 @@ func Limits() *schema.Table {
 			},
 			{
 				Name:        "regex",
-				Type:        arrow.BinaryTypes.String,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The regular expression used to match the URI.",
 				Resolver:    schema.PathResolver("Rate.Regex"),
 			},
 			{
 				Name:        "uri",
-				Type:        arrow.BinaryTypes.String,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The URI that the regular expression matches.",
 				Resolver:    schema.PathResolver("Rate.URI"),
 			},
 			{
 				Name:        "verb",
-				Type:        arrow.BinaryTypes.String,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The HTTP verb used to match the URI.",
 				Resolver:    schema.PathResolver("Rate.Limit.Verb"),
 			},
 			{
 				Name:        "next_available",
-				Type:        arrow.BinaryTypes.String,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The next available time for the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.NextAvailable"),
 			},
 			{
 				Name:        "unit",
-				Type:        arrow.BinaryTypes.String,
+				Type:        arrow.ListOf(arrow.BinaryTypes.String),
 				Description: "The unit of the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.Unit"),
 			},
 			{
 				Name:        "value",
-				Type:        arrow.PrimitiveTypes.Int64,
+				Type:        arrow.ListOf(arrow.PrimitiveTypes.Int64),
 				Description: "The value of the rate limit.",
 				Resolver:    schema.PathResolver("Rate.Limit.Value"),
 			},
 			{
 				Name:        "remaining",
-				Type:        arrow.PrimitiveTypes.Int64,
+				Type:        arrow.ListOf(arrow.PrimitiveTypes.Int64),
 				Description: "The number of requests remaining in the current rate limit window.",
 				Resolver:    schema.PathResolver("Rate.Limit.Remaining"),
 			},
@@ -157,7 +157,7 @@ type Limit struct {
 		TotalBackupsUsed         int `json:"totalBackupsUsed"`
 		TotalBackupGigabytesUsed int `json:"totalBackupGigabytesUsed"`
 	} `json:"absolute"`
-	Rate struct {
+	Rate []struct {
 		Regex string `json:"regex"`
 		URI   string `json:"uri"`
 		Limit struct {
