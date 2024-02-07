@@ -140,7 +140,7 @@ func fetchLimits(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 
 	limits, err := limits.Get(nova, opts).Extract()
 	if err != nil {
-		api.Logger().Error().Err(err).Msg("error retrieving limits)")
+		api.Logger().Error().Err(err).Msg("error retrieving limits")
 		return err
 	}
 

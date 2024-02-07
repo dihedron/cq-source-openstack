@@ -1,19 +1,19 @@
 version: '3.7'
 services:
-    cloudquery:
-        image: postgres:14
-        restart: unless-stopped
-        environment:
-          - POSTGRES_USER=cloudquery
-          - POSTGRES_PASSWORD=cloudquery
-        logging:
-          options:
-            max-size: 10m
-            max-file: "3"
-        ports:
-          - '5433:5432'
-        volumes: 
-          - cloudquery_data:/var/lib/postgresql/data
+  cloudquery:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=cloudquery
+      - POSTGRES_PASSWORD=cloudquery
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - '5433:5432'
+    volumes:
+      - cloudquery_data:/var/lib/postgresql/data
 volumes:
   cloudquery_data:
     external: false

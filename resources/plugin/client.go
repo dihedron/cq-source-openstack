@@ -100,6 +100,7 @@ func getTables() schema.Tables {
 		compute.Instances(),
 		compute.Limits(),
 		compute.Networks(),
+		compute.SecGroups(),
 		identity.Projects(),
 		identity.Users(),
 		image_service.Images(),

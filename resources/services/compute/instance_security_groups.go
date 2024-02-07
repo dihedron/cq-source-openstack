@@ -14,7 +14,7 @@ func InstanceSecurityGroups() *schema.Table {
 		Name:     "openstack_compute_instance_security_groups",
 		Resolver: fetchInstanceSecurityGroups,
 		Transform: transformers.TransformWithStruct(
-			&SecurityGroup{},
+			&InstanceSecurityGroup{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
@@ -39,6 +39,6 @@ func fetchInstanceSecurityGroups(ctx context.Context, meta schema.ClientMeta, pa
 	return nil
 }
 
-type SecurityGroup struct {
+type InstanceSecurityGroup struct {
 	Name string `json:"name"`
 }
