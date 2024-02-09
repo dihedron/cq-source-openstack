@@ -30,13 +30,14 @@ func fetchAvailabilityZones(ctx context.Context, meta schema.ClientMeta, parent 
 
 	allPages, err := availabilityzones.List(cinder).AllPages()
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error listing availabilityzones")
+		return err
 	}
 
 	allAvailabilityZones, err := availabilityzones.ExtractAvailabilityZones(allPages)
 	if err != nil {
 		api.Logger().Error().Err(err).Msg("error getting availabilityzones")
-		panic(err)
+		return err
 	}
 
 	for _, zoneInfo := range allAvailabilityZones {

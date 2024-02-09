@@ -39,7 +39,8 @@ func fetchQoS(ctx context.Context, meta schema.ClientMeta, parent *schema.Resour
 	}
 	allQoS, err := qos.ExtractQoS(allPages)
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error extracting QoS")
+		return err
 	}
 	for _, qos := range allQoS {
 		if ctx.Err() != nil {

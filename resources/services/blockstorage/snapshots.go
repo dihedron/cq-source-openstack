@@ -41,7 +41,8 @@ func fetchSnapshots(ctx context.Context, meta schema.ClientMeta, parent *schema.
 	}
 	allSnapshots, err := snapshots.ExtractSnapshots(allPages)
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error extracting snapshots")
+		return err
 	}
 	for _, snapshot := range allSnapshots {
 		if ctx.Err() != nil {

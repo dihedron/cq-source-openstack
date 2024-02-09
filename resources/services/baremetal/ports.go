@@ -43,7 +43,8 @@ func fetchPort(ctx context.Context, meta schema.ClientMeta, parent *schema.Resou
 
 	allPorts, err := ports.ExtractPorts(allPages)
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error extracting ports")
+		return err
 	}
 	for _, port := range allPorts {
 		if ctx.Err() != nil {

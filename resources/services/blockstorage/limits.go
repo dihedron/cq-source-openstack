@@ -137,7 +137,7 @@ func fetchLimits(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 	allLimits, err := limits.Get(cinder).Extract()
 	if err != nil {
 		api.Logger().Error().Err(err).Msg("error getting limits")
-		panic(err)
+		return err
 	}
 
 	res <- allLimits

@@ -39,7 +39,8 @@ func fetchAllocation(ctx context.Context, meta schema.ClientMeta, parent *schema
 
 	allAllocations, err := allocations.ExtractAllocations(allPages)
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error extracting allocations")
+		return err
 	}
 	for _, allocation := range allAllocations {
 		if ctx.Err() != nil {

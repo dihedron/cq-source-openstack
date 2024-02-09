@@ -42,7 +42,8 @@ func fetchNode(ctx context.Context, meta schema.ClientMeta, parent *schema.Resou
 
 	allNodes, err := nodes.ExtractNodes(allPages)
 	if err != nil {
-		panic(err)
+		api.Logger().Err(err).Msg("error extracting nodes")
+		return err
 	}
 	for _, node := range allNodes {
 		if ctx.Err() != nil {
