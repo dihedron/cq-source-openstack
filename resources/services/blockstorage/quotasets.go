@@ -63,31 +63,11 @@ func fetchQuotaSets(ctx context.Context, meta schema.ClientMeta, parent *schema.
 	// for each project, get the associated QuotaSets
 	for _, projectID := range projectIDs {
 		quotaset, err := quotasets.Get(cinder, projectID).Extract()
-		// if err != nil {
-		// 	api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing QuotaSets with options")
-		// 	return err
-		// }
 		if err != nil {
 			api.Logger().Error().Err(err).Msg("error extracting quota sets for project " + projectID)
 			return err
 		}
 		res <- quotaset
-		// allQuotaSets := []*Attachment{}
-		// err = QuotaSets.ExtractQuotaSetsInto(allPages, &allQuotaSets)
-
-		// api.Logger().Debug().Str("project", projectID).Int("count", len(allQuotaSets)).Msg("QuotaSets retrieved")
-
-		// for _, attachment := range allQuotaSets {
-		// 	if ctx.Err() != nil {
-		// 		api.Logger().Debug().Msg("context done, exit")
-		// 		break
-		// 	}
-		// 	attachment := attachment
-		// 	attachment.ProjectID = projectID
-		// 	//api.Logger().Debug().Str("data", format.ToPrettyJSON(attachment)).Msg("streaming attachment")
-		// 	api.Logger().Debug().Str("id", attachment.ID).Msg("streaming attachment")
-		// 	res <- attachment
-		// }
 	}
 	return nil
 }
