@@ -7,6 +7,7 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-source-openstack/client"
+	"github.com/dihedron/cq-source-openstack/resources/services/compute"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 )
@@ -21,7 +22,7 @@ func Projects() *schema.Table {
 			transformers.WithSkipFields("Links"),
 		),
 		Relations: []*schema.Table{
-			ProjectLimits(),
+			compute.ProjectLimits(),
 		},
 		// Columns: []schema.Column{
 		// 	{

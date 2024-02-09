@@ -1,4 +1,4 @@
-package identity
+package compute
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 
 func ProjectLimits() *schema.Table {
 	return &schema.Table{
-		Name:     "openstack_identity_project_limits",
+		Name:     "openstack_compute_project_limits",
 		Resolver: fetchProjectLimits,
 		Transform: transformers.TransformWithStruct(
 			&limits.Absolute{},
@@ -23,7 +23,6 @@ func ProjectLimits() *schema.Table {
 			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 			transformers.WithSkipFields("Links"),
 		),
-		Relations: []*schema.Table{},
 	}
 }
 

@@ -26,6 +26,9 @@ func Volumes() *schema.Table {
 
 			transformers.WithSkipFields("Links"),
 		),
+		Relations: []*schema.Table{
+			VolumesBackups(),
+		},
 		// Columns: []schema.Column{
 		// 	{
 		// 		Name:        "tags",
