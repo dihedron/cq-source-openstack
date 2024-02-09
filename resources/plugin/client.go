@@ -91,6 +91,8 @@ func getTables() schema.Tables {
 		blockstorage.Backups(),
 		blockstorage.Limits(),
 		blockstorage.QoS(),
+		blockstorage.QuotaSets(),
+		blockstorage.Services(),
 		blockstorage.Snapshots(),
 		blockstorage.Volumes(),
 		compute.Aggregates(),
