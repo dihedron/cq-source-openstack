@@ -22,15 +22,15 @@ func ServerUsage() *schema.Table {
 		Columns: []schema.Column{
 			{
 				Name:        "started_at",
-				Type: 	 	 arrow.FixedWidthTypes.Timestamp_us,
+				Type:        arrow.FixedWidthTypes.Timestamp_us,
 				Description: "The time when the server usage started.",
-				Resolver:	 schema.PathResolver("StartedAt"),
+				Resolver:    schema.PathResolver("StartedAt"),
 			},
 			{
 				Name:        "ended_at",
-				Type: 	 	 arrow.FixedWidthTypes.Timestamp_us,
+				Type:        arrow.FixedWidthTypes.Timestamp_us,
 				Description: "The time when the server usage ended.",
-				Resolver:	 schema.PathResolver("EndedAt"),
+				Resolver:    schema.PathResolver("EndedAt"),
 			},
 		},
 	}
@@ -55,12 +55,12 @@ func fetchServerUsage(ctx context.Context, meta schema.ClientMeta, parent *schem
 		if err != nil {
 			return false, err
 		}
-	
+
 		res <- allTenantsUsage
-	
+
 		return true, nil
 	})
-	
+
 	if err != nil {
 		api.Logger().Error().Err(err).Msg("error extracting all tenants usage")
 		return err
@@ -70,16 +70,16 @@ func fetchServerUsage(ctx context.Context, meta schema.ClientMeta, parent *schem
 }
 
 type Usage struct {
-	EndedAt utils.Time `json:"-"`
-	Flavor string `json:"flavor"`
-	Hours float64 `json:"hours"`
-	InstanceID string `json:"instance_id"`
-	LocalGB int `json:"local_gb"`
-	MemoryMB int `json:"memory_mb"`
-	Name string `json:"name"`
-	StartedAt utils.Time `json:"-"`
-	State string `json:"state"`
-	TenantID string `json:"tenant_id"`
-	Uptime int `json:"uptime"`
-	VCPUs int `json:"vcpus"`
+	EndedAt    utils.Time `json:"-"`
+	Flavor     string     `json:"flavor"`
+	Hours      float64    `json:"hours"`
+	InstanceID string     `json:"instance_id"`
+	LocalGB    int        `json:"local_gb"`
+	MemoryMB   int        `json:"memory_mb"`
+	Name       string     `json:"name"`
+	StartedAt  utils.Time `json:"-"`
+	State      string     `json:"state"`
+	TenantID   string     `json:"tenant_id"`
+	Uptime     int        `json:"uptime"`
+	VCPUs      int        `json:"vcpus"`
 }

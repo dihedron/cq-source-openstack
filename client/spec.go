@@ -31,7 +31,7 @@ type Spec struct {
 
 func (s *Spec) Validate() error {
 	// Check that the endpoint URL is a valid URL
-	_ , err := url.ParseRequestURI(*s.EndpointUrl)
+	_, err := url.ParseRequestURI(*s.EndpointUrl)
 	if err != nil {
 		log.Error().Err(err).Msg("invalid endpoint URL")
 		return err

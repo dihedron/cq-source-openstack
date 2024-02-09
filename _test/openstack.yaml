@@ -8,7 +8,7 @@ spec:
     ["openstack*"]
   destinations:
     - sqlite
-#    - postgresql
+  #    - postgresql
   spec:
     endpoint_url: ${OPENSTACK_ENDPOINT_URL}
     username: ${OPENSTACK_USERNAME}
@@ -25,7 +25,7 @@ spec:
 #   path: cloudquery/gitlab
 #   version: v3.0.0
 #   tables: ["*"]
-#   destinations: 
+#   destinations:
 #     - sqlite
 #     - postgresql
 #   spec:
@@ -47,6 +47,6 @@ spec:
   path: cloudquery/postgresql
   version: v7.1.6
   spec:
-    connection_string: postgresql://cloudquery:cloudquery@localhost:15433/cloudquery?sslmode=disable    
-#    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable  
+    connection_string: postgresql://cloudquery:cloudquery@localhost:15433/cloudquery?sslmode=disable
+#    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable
 #    connection_string: postgresql://superset:superset@localhost:15432/superset?sslmode=disable
