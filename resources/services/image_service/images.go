@@ -24,6 +24,7 @@ func Images() *schema.Table {
 			transformers.WithSkipFields("Links"),
 		),
 		Relations: []*schema.Table{
+			ImageMembers(),
 			ImageMetadata(),
 			ImageProperties(),
 			ImageTags(),
