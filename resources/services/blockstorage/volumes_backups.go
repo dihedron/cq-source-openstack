@@ -16,7 +16,7 @@ func VolumesBackups() *schema.Table {
 		Name:     "openstack_blockstorage_volumes_backups",
 		Resolver: fetchVolumesBackups,
 		Transform: transformers.TransformWithStruct(
-			&backups.Backup{},
+			&Backup{},
 			transformers.WithPrimaryKeys("ID"),
 			transformers.WithSkipFields("CreatedAt", "UpdatedAt", "DataTimestamp"),
 		),

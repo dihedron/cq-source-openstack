@@ -32,7 +32,7 @@ func fetchServices(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 		return err
 	}
 
-	service_types := [5]string{"blockstorage", "compute", "identity", "image_service", "networking"}
+	service_types := [5]string{"blockstorage", "compute", "identity", "imageservice", "networking"}
 	result := []services.Service{}
 	for _, service_type := range service_types {
 		service_type := service_type

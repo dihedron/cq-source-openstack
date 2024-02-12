@@ -1,7 +1,8 @@
 package plugin
 
-var (
+const (
 	Name    = "dihedron-openstack"
 	Kind    = "source"
-	Version = "development"
 )
+
+var Version = "development"
