@@ -108,6 +108,7 @@ func getTables() schema.Tables {
 		identity.Projects(),
 		identity.Tenants(),
 		identity.Users(),
+		identity.Services(),
 		image_service.Images(),
 		networking.Networks(),
 		networking.Ports(),
