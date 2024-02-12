@@ -12,12 +12,12 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-source-openstack/client"
 
-	// "github.com/dihedron/cq-source-openstack/resources/services/baremetal"
-	"github.com/dihedron/cq-source-openstack/resources/services/blockstorage"
-	"github.com/dihedron/cq-source-openstack/resources/services/compute"
-	"github.com/dihedron/cq-source-openstack/resources/services/identity"
-	"github.com/dihedron/cq-source-openstack/resources/services/image_service"
-	"github.com/dihedron/cq-source-openstack/resources/services/networking"
+	// "github.com/dihedron/cq-source-openstack/resources/services/ironic"
+	"github.com/dihedron/cq-source-openstack/resources/services/cinder"
+	"github.com/dihedron/cq-source-openstack/resources/services/nova"
+	"github.com/dihedron/cq-source-openstack/resources/services/keystone"
+	"github.com/dihedron/cq-source-openstack/resources/services/glance"
+	"github.com/dihedron/cq-source-openstack/resources/services/neutron"
 	"github.com/rs/zerolog"
 )
 
@@ -82,38 +82,38 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables() schema.Tables {
 	tables := schema.Tables{
-		// baremetal.Allocations(),
-		// baremetal.Drivers(),
-		// baremetal.Nodes(),
-		// baremetal.Ports(),
-		blockstorage.Attachments(),
-		blockstorage.AvailabilityZones(),
-		blockstorage.Limits(),
-		blockstorage.QoS(),
-		blockstorage.QuotaSets(),
-		blockstorage.QuotaSetsUsage(),
-		blockstorage.Services(),
-		blockstorage.Snapshots(),
-		blockstorage.Volumes(),
-		compute.Aggregates(),
-		compute.Flavors(),
-		compute.Hypervisors(),
-		// compute.Images(),
-		compute.Instances(),
-		// compute.Networks(),
-		// compute.SecGroups(),
-		compute.ServerUsage(),
-		// compute.TenantNetworks(),
-		identity.Domains(),
-		identity.Projects(),
-		identity.Tenants(),
-		identity.Users(),
-		identity.Services(),
-		image_service.Images(),
-		networking.Networks(),
-		networking.Ports(),
-		networking.SecurityGroups(),
-		networking.SecurityGroupRules(),
+		// ironic.Allocations(),
+		// ironic.Drivers(),
+		// ironic.Nodes(),
+		// ironic.Ports(),
+		cinder.Attachments(),
+		cinder.AvailabilityZones(),
+		cinder.Limits(),
+		cinder.QoS(),
+		cinder.QuotaSets(),
+		cinder.QuotaSetsUsage(),
+		cinder.Services(),
+		cinder.Snapshots(),
+		cinder.Volumes(),
+		nova.Aggregates(),
+		nova.Flavors(),
+		nova.Hypervisors(),
+		// nova.Images(),
+		nova.Instances(),
+		// nova.Networks(),
+		// nova.SecGroups(),
+		nova.ServerUsage(),
+		// nova.TenantNetworks(),
+		keystone.Domains(),
+		keystone.Projects(),
+		// keystone.Tenants(),
+		keystone.Users(),
+		keystone.Services(),
+		glance.Images(),
+		neutron.Networks(),
+		neutron.Ports(),
+		neutron.SecurityGroups(),
+		neutron.SecurityGroupRules(),
 	}
 	if err := transformers.TransformTables(tables); err != nil {
 		panic(err)
