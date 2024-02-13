@@ -6,6 +6,7 @@ require (
 	github.com/apache/arrow/go/v15 v15.0.0
 	github.com/cloudquery/plugin-sdk/v4 v4.29.1
 	github.com/dihedron/cq-plugin-utils v0.0.0-20240212132618-72d9467fc77a
+	github.com/gobwas/glob v0.2.3
 	github.com/gophercloud/gophercloud v1.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/rs/zerolog v1.29.1

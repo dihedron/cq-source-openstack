@@ -4,8 +4,7 @@ spec:
   registry: local
   path: "../dist/cq-source-openstack_linux_amd64_v1/cq-source-openstack"
   version: v1.0.0
-  tables: 
-    ["openstack*"]
+  tables: ["openstack*"]
   destinations:
     - sqlite
   #    - postgresql
@@ -18,6 +17,8 @@ spec:
     domain_name: ${OPENSTACK_DOMAIN_NAME}
     app_credential_id: ${OPENSTACK_APP_CREDENTIAL_ID}
     app_credential_secret: ${OPENSTACK_APP_CREDENTIAL_SECRET}
+    included_tables: ["openstack_nova*", "openstack_cinder*"]
+    excluded_tables: ["openstack_cinder_attachment*"]
 # ---
 # kind: source
 # spec:
