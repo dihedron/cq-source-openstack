@@ -14,10 +14,10 @@ import (
 
 	// "github.com/dihedron/cq-source-openstack/resources/services/ironic"
 	"github.com/dihedron/cq-source-openstack/resources/services/cinder"
-	"github.com/dihedron/cq-source-openstack/resources/services/nova"
-	"github.com/dihedron/cq-source-openstack/resources/services/keystone"
 	"github.com/dihedron/cq-source-openstack/resources/services/glance"
+	"github.com/dihedron/cq-source-openstack/resources/services/keystone"
 	"github.com/dihedron/cq-source-openstack/resources/services/neutron"
+	"github.com/dihedron/cq-source-openstack/resources/services/nova"
 	"github.com/rs/zerolog"
 )
 
