@@ -3,9 +3,9 @@ package nova
 import (
 	"context"
 
-	"github.com/apache/arrow/go/v15/arrow"
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
+	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/usage"
@@ -18,21 +18,8 @@ func ServerUsage() *schema.Table {
 		Resolver: fetchServerUsage,
 		Transform: transformers.TransformWithStruct(
 			&Usage{},
+			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 		),
-		Columns: []schema.Column{
-			{
-				Name:        "started_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The time when the server usage started.",
-				Resolver:    schema.PathResolver("StartedAt"),
-			},
-			{
-				Name:        "ended_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The time when the server usage ended.",
-				Resolver:    schema.PathResolver("EndedAt"),
-			},
-		},
 	}
 }
 
@@ -70,16 +57,16 @@ func fetchServerUsage(ctx context.Context, meta schema.ClientMeta, parent *schem
 }
 
 type Usage struct {
-	EndedAt    utils.Time `json:"-"`
-	Flavor     string     `json:"flavor"`
-	Hours      float64    `json:"hours"`
-	InstanceID string     `json:"instance_id"`
-	LocalGB    int        `json:"local_gb"`
-	MemoryMB   int        `json:"memory_mb"`
-	Name       string     `json:"name"`
-	StartedAt  utils.Time `json:"-"`
-	State      string     `json:"state"`
-	TenantID   string     `json:"tenant_id"`
-	Uptime     int        `json:"uptime"`
-	VCPUs      int        `json:"vcpus"`
+	EndedAt    *utils.Time `json:"-" cq-type:"timestamp"`
+	Flavor     string      `json:"flavor"`
+	Hours      float64     `json:"hours"`
+	InstanceID string      `json:"instance_id"`
+	LocalGB    int         `json:"local_gb"`
+	MemoryMB   int         `json:"memory_mb"`
+	Name       string      `json:"name"`
+	StartedAt  *utils.Time `json:"-" cq-type:"timestamp"`
+	State      string      `json:"state"`
+	TenantID   string      `json:"tenant_id"`
+	Uptime     int         `json:"uptime"`
+	VCPUs      int         `json:"vcpus"`
 }

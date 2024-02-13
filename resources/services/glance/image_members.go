@@ -3,10 +3,10 @@ package glance
 import (
 	"context"
 
-	"github.com/apache/arrow/go/v15/arrow"
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
+	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
@@ -19,24 +19,8 @@ func ImageMembers() *schema.Table {
 		Resolver: fetchImageMembers,
 		Transform: transformers.TransformWithStruct(
 			&Member{},
-			// transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
-			// transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
-			//transformers.WithSkipFields("OriginalName", "ExtraSpecs"),
+			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 		),
-		Columns: []schema.Column{
-			{
-				Name:        "created_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The date and time when the image member was created.",
-				Resolver:    schema.PathResolver("CreatedAt"),
-			},
-			{
-				Name:        "updated_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The date and time when the image member was updated.",
-				Resolver:    schema.PathResolver("UpdatedAt"),
-			},
-		},
 	}
 }
 
@@ -80,10 +64,10 @@ func fetchImageMembers(ctx context.Context, meta schema.ClientMeta, parent *sche
 }
 
 type Member struct {
-	CreatedAt utils.Time `json:"created_at"`
-	ImageID   string     `json:"image_id"`
-	MemberID  string     `json:"member_id"`
-	Schema    string     `json:"schema"`
-	Status    string     `json:"status"`
-	UpdatedAt utils.Time `json:"updated_at"`
+	CreatedAt *utils.Time `json:"created_at" cq-type:"timestamp"`
+	ImageID   string      `json:"image_id"`
+	MemberID  string      `json:"member_id"`
+	Schema    string      `json:"schema"`
+	Status    string      `json:"status"`
+	UpdatedAt *utils.Time `json:"updated_at" cq-type:"timestamp"`
 }

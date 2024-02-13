@@ -3,9 +3,9 @@ package cinder
 import (
 	"context"
 
-	"github.com/apache/arrow/go/v15/arrow"
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
+	"github.com/dihedron/cq-plugin-utils/transform"
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/extensions/backups"
@@ -18,28 +18,8 @@ func VolumesBackups() *schema.Table {
 		Transform: transformers.TransformWithStruct(
 			&Backup{},
 			transformers.WithPrimaryKeys("ID"),
-			transformers.WithSkipFields("CreatedAt", "UpdatedAt", "DataTimestamp"),
+			transformers.WithTypeTransformer(transform.TagTypeTransformer), // use cq-type tags to translate type
 		),
-		Columns: []schema.Column{
-			{
-				Name:        "created_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The date the backup was created.",
-				Resolver:    schema.PathResolver("backups.CreatedAt"),
-			},
-			{
-				Name:        "updated_at",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The date the backup was updated.",
-				Resolver:    schema.PathResolver("backups.UpdatedAt"),
-			},
-			{
-				Name:        "DataTimestamp",
-				Type:        arrow.FixedWidthTypes.Timestamp_us,
-				Description: "The data timestamp when the data on the volume was first saved.",
-				Resolver:    schema.PathResolver("backups.DataTimestamp"),
-			},
-		},
 	}
 }
 
@@ -78,9 +58,9 @@ type Backup struct {
 	// ID is the Unique identifier of the backup.
 	ID string `json:"id"`
 	// CreatedAt is the date the backup was created.
-	CreatedAt utils.Time `json:"created_at"`
+	CreatedAt *utils.Time `json:"created_at" cq-type:"timestamp"`
 	// UpdatedAt is the date the backup was updated.
-	UpdatedAt utils.Time `json:"updated_at"`
+	UpdatedAt *utils.Time `json:"updated_at" cq-type:"timestamp"`
 	// Name is the display name of the backup.
 	Name string `json:"name"`
 	// Description is the description of the backup.
@@ -105,7 +85,7 @@ type Backup struct {
 	// IsIncremental is whether this is an incremental backup.
 	IsIncremental bool `json:"is_incremental"`
 	// DataTimestamp is the time when the data on the volume was first saved.
-	DataTimestamp utils.Time `json:"data_timestamp"`
+	DataTimestamp *utils.Time `json:"data_timestamp" cq-type:"timestamp"`
 	// ProjectID is the ID of the project that owns the backup. This is
 	// an admin-only field.
 	ProjectID string `json:"os-backup-project-attr:project_id"`
