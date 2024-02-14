@@ -50,27 +50,27 @@ func (pm *PatternMatcher) Match(value string) bool {
 	var g glob.Glob
 
 	is_included := false
-    // Check if the value matches any pattern in the pm.include list
-    for _, pattern := range pm.include {
+	// Check if the value matches any pattern in the pm.include list
+	for _, pattern := range pm.include {
 		g = glob.MustCompile(pattern)
 		matched := g.Match(value)
-        if matched {
-            is_included = true
-            break
-        }
-    }
+		if matched {
+			is_included = true
+			break
+		}
+	}
 	if !is_included {
 		return false
 	}
 	// Check if the value matches any pattern in the excluded list
-    for _, pattern := range pm.exclude {
+	for _, pattern := range pm.exclude {
 		g = glob.MustCompile(pattern)
 		matched := g.Match(value)
-        if matched {
-            return false
-        }
-    }
+		if matched {
+			return false
+		}
+	}
 	// If the value matches at least one pattern in the included list
-    // and does not match any pattern in the excluded list, return true
+	// and does not match any pattern in the excluded list, return true
 	return true
 }
