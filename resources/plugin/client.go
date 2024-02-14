@@ -13,7 +13,7 @@ import (
 	"github.com/dihedron/cq-source-openstack/client"
 	"github.com/dihedron/cq-source-openstack/resources/internal/pattern_matcher"
 
-	// "github.com/dihedron/cq-source-openstack/resources/services/ironic"
+	"github.com/dihedron/cq-source-openstack/resources/services/ironic"
 	"github.com/dihedron/cq-source-openstack/resources/services/cinder"
 	"github.com/dihedron/cq-source-openstack/resources/services/glance"
 	"github.com/dihedron/cq-source-openstack/resources/services/keystone"
@@ -86,10 +86,10 @@ func (*Client) Close(_ context.Context) error {
 
 func getTables(spec *client.Spec) schema.Tables {
 	available_tables := schema.Tables{
-		// ironic.Allocations(),
-		// ironic.Drivers(),
-		// ironic.Nodes(),
-		// ironic.Ports(),
+		ironic.Allocations(),
+		ironic.Drivers(),
+		ironic.Nodes(),
+		ironic.Ports(),
 		cinder.Attachments(),
 		cinder.AvailabilityZones(),
 		cinder.Limits(),
@@ -102,15 +102,15 @@ func getTables(spec *client.Spec) schema.Tables {
 		nova.Aggregates(),
 		nova.Flavors(),
 		nova.Hypervisors(),
-		// nova.Images(),
+		nova.Images(),
 		nova.Instances(),
-		// nova.Networks(),
-		// nova.SecGroups(),
+		nova.Networks(),
+		nova.SecGroups(),
 		nova.ServerUsage(),
-		// nova.TenantNetworks(),
+		nova.TenantNetworks(),
 		keystone.Domains(),
 		keystone.Projects(),
-		// keystone.Tenants(),
+		keystone.Tenants(),
 		keystone.Users(),
 		keystone.Services(),
 		glance.Images(),
@@ -156,8 +156,4 @@ func getTables(spec *client.Spec) schema.Tables {
 		schema.AddCqIDs(t)
 	}
 	return tables
-}
-
-func WithIncludeFilter(i string) {
-	panic("unimplemented")
 }

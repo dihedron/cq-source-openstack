@@ -17,8 +17,16 @@ spec:
     domain_name: ${OPENSTACK_DOMAIN_NAME}
     app_credential_id: ${OPENSTACK_APP_CREDENTIAL_ID}
     app_credential_secret: ${OPENSTACK_APP_CREDENTIAL_SECRET}
-    included_tables: ["openstack_nova*", "openstack_cinder*"]
-    excluded_tables: ["openstack_cinder_attachment*"]
+    included_tables: ["openstack*"]
+    excluded_tables:
+      [
+        "openstack_ironic*",
+        "openstack_nova_images",
+        "openstack_nova_networks",
+        "openstack_nova_secgroups",
+        "openstack_nova_tenant*",
+        "openstack_keystone_tenants",
+      ]
 # ---
 # kind: source
 # spec:
