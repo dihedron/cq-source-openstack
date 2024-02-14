@@ -5,7 +5,6 @@ import "github.com/gobwas/glob"
 type PatternMatcher struct {
 	include []string
 	exclude []string
-	name    string
 }
 
 // Option is the type for functional options.
@@ -51,29 +50,27 @@ func (pm *PatternMatcher) Match(value string) bool {
 	var g glob.Glob
 
 	is_included := false
-	is_excluded := false
-
-	for _, in := range pm.include {
-		g = glob.MustCompile(in)
-		is_included = g.Match(value)
-		if is_included {
-			break
-		}
-	}
+    // Check if the value matches any pattern in the pm.include list
+    for _, pattern := range pm.include {
+		g = glob.MustCompile(pattern)
+		matched := g.Match(value)
+        if matched {
+            is_included = true
+            break
+        }
+    }
 	if !is_included {
 		return false
 	}
-
-	for _, ex := range pm.exclude {
-		g = glob.MustCompile(ex)
-		is_excluded = g.Match(value)
-		if !is_excluded {
-			return true
-		}
-	}
-
-	if is_included && !is_excluded {
-		return true
-	}
-	return false
+	// Check if the value matches any pattern in the excluded list
+    for _, pattern := range pm.exclude {
+		g = glob.MustCompile(pattern)
+		matched := g.Match(value)
+        if matched {
+            return false
+        }
+    }
+	// If the value matches at least one pattern in the included list
+    // and does not match any pattern in the excluded list, return true
+	return true
 }

@@ -16,7 +16,7 @@ func TestPatternMatcher(t *testing.T) {
 		want   bool
 	}{
 		{
-			"test1",
+			"test_1",
 			fields{
 				include: []string{"*"},
 				exclude: []string{},
@@ -25,7 +25,7 @@ func TestPatternMatcher(t *testing.T) {
 			true,
 		},
 		{
-			"test2",
+			"test_2",
 			fields{
 				include: []string{"*"},
 				exclude: []string{"hello*"},
@@ -34,13 +34,31 @@ func TestPatternMatcher(t *testing.T) {
 			false,
 		},
 		{
-			"test3",
+			"test_3",
 			fields{
 				include: []string{"*"},
 				exclude: []string{"hello*"},
 			},
-			"ciao_world",
+			"hi_world",
 			true,
+		},
+		{
+			"test_4",
+			fields{
+				include: []string{"hello"},
+				exclude: []string{"*"},
+			},
+			"hello",
+			false,
+		},
+		{
+			"test_5",
+			fields{
+				include: []string{"openstack_nova*", "openstack_cinder*"},
+				exclude: []string{"openstack_cinder_attachment*"},
+			},
+			"openstack_cinder_attachments",
+			false,
 		},
 	}
 	for _, tt := range tests {
