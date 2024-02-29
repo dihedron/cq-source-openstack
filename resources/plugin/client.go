@@ -38,10 +38,12 @@ func Configure(ctx context.Context, logger zerolog.Logger, spec []byte, opts plu
 		return nil, fmt.Errorf("failed to unmarshal spec: %w", err)
 	}
 
+	tables := getTables(config)
+
 	if opts.NoConnection {
 		return &Client{
 			logger: logger,
-			tables: getTables(config),
+			tables: tables,
 		}, nil
 	}
 
@@ -49,8 +51,6 @@ func Configure(ctx context.Context, logger zerolog.Logger, spec []byte, opts plu
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client: %w", err)
 	}
-
-	tables := getTables(config)
 
 	return &Client{
 		logger:     logger,
@@ -121,28 +121,16 @@ func getTables(spec *client.Spec) schema.Tables {
 	}
 
 	// must compile these patterns to be included
-	includesDaSpec := spec.IncludedTables
+	includesFromSpec := spec.IncludedTables
 	// must compile these patterns to be excluded
-	excludesDaSpec := spec.ExcludedTables
+	excludesFromSpec := spec.ExcludedTables
 
-	// if includesDaSpec is empty, include everything
-	var pm *pattern_matcher.PatternMatcher
-	if len(includesDaSpec) == 0 {
-		pm = pattern_matcher.New(
-			pattern_matcher.WithExclude(excludesDaSpec),
-		)
-	} else if len(excludesDaSpec) == 0 {
-		pm = pattern_matcher.New(
-			pattern_matcher.WithInclude(includesDaSpec),
-		)
-	} else {
-		pm = pattern_matcher.New(
-			pattern_matcher.WithInclude(includesDaSpec),
-			pattern_matcher.WithExclude(excludesDaSpec),
-		)
-	}
+	pm := pattern_matcher.New(
+		pattern_matcher.WithInclude(includesFromSpec),
+		pattern_matcher.WithExclude(excludesFromSpec),
+	)
 
-	tables := make(schema.Tables, 0, len(available_tables))
+	tables := schema.Tables{}
 	for _, t := range available_tables {
 		if pm.Match(t.Name) {
 			tables = append(tables, t)
