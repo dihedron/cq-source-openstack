@@ -47,7 +47,6 @@ func fetchQoS(ctx context.Context, meta schema.ClientMeta, parent *schema.Resour
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		qos := qos
 		api.Logger().Debug().Str("data", qos.ID).Msg("streaming qos")
 		res <- qos
 	}

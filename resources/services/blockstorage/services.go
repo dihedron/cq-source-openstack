@@ -48,7 +48,6 @@ func fetchServices(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		service := service
 		res <- service
 	}
 

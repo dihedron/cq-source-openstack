@@ -50,7 +50,6 @@ func fetchQuotaSets(ctx context.Context, meta schema.ClientMeta, parent *schema.
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		project := project
 		projectIDs = append(projectIDs, project.ID)
 	}
 

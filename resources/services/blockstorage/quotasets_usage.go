@@ -223,7 +223,6 @@ func fetchQuotaSetsUsage(ctx context.Context, meta schema.ClientMeta, parent *sc
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		project := project
 		projectIDs = append(projectIDs, project.ID)
 	}
 

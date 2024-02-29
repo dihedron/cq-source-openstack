@@ -47,7 +47,6 @@ func fetchAllocation(ctx context.Context, meta schema.ClientMeta, parent *schema
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		allocation := allocation
 		api.Logger().Debug().Str("name", allocation.Name).Msg("streaming allocation")
 		res <- allocation
 	}

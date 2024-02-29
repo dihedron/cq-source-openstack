@@ -54,7 +54,6 @@ func fetchDomains(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		domain := domain
 		api.Logger().Debug().Str("domain id", domain.ID).Str("data", format.ToJSON(domain)).Msg("streaming domain")
 		res <- domain
 	}

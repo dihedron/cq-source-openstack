@@ -51,7 +51,6 @@ func fetchPort(ctx context.Context, meta schema.ClientMeta, parent *schema.Resou
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		port := port
 		api.Logger().Debug().Str("name", port.UUID).Msg("streaming port")
 		res <- port
 	}

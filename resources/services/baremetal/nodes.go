@@ -50,7 +50,6 @@ func fetchNode(ctx context.Context, meta schema.ClientMeta, parent *schema.Resou
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		node := node
 		api.Logger().Debug().Str("name", node.Name).Msg("streaming node")
 		res <- node
 	}

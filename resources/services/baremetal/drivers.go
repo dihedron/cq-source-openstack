@@ -48,7 +48,6 @@ func fetchDriver(ctx context.Context, meta schema.ClientMeta, parent *schema.Res
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		driver := driver
 		api.Logger().Debug().Str("name", driver.Name).Msg("streaming driver")
 		res <- driver
 	}

@@ -49,7 +49,6 @@ func fetchSnapshots(ctx context.Context, meta schema.ClientMeta, parent *schema.
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		snapshot := snapshot
 		api.Logger().Debug().Str("data", snapshot.ID).Msg("streaming snapshot")
 		res <- snapshot
 	}

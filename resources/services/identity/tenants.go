@@ -54,7 +54,6 @@ func fetchTenants(ctx context.Context, meta schema.ClientMeta, parent *schema.Re
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		tenant := tenant
 		api.Logger().Debug().Str("tenant id", tenant.ID).Str("data", format.ToJSON(tenant)).Msg("streaming tenant")
 		res <- tenant
 	}

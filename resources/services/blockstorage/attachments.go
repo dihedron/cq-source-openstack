@@ -219,7 +219,6 @@ func fetchAttachments(ctx context.Context, meta schema.ClientMeta, parent *schem
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		project := project
 		projectIDs = append(projectIDs, project.ID)
 	}
 

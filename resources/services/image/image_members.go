@@ -55,7 +55,6 @@ func fetchImageMembers(ctx context.Context, meta schema.ClientMeta, parent *sche
 			api.Logger().Debug().Msg("context done, exit")
 			break
 		}
-		member := member
 		api.Logger().Debug().Str("member id", member.MemberID).Str("data", format.ToJSON(member)).Msg("streaming image member")
 		res <- member
 	}
