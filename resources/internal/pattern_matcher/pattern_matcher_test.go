@@ -54,10 +54,10 @@ func TestPatternMatcher(t *testing.T) {
 		{
 			"test_5",
 			fields{
-				include: []string{"openstack_nova*", "openstack_cinder*"},
-				exclude: []string{"openstack_cinder_attachment*"},
+				include: []string{"openstack_compute*", "openstack_blockstorage*"},
+				exclude: []string{"openstack_blockstorage_attachment*"},
 			},
-			"openstack_cinder_attachments",
+			"openstack_blockstorage_attachments",
 			false,
 		},
 	}

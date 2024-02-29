@@ -20,12 +20,12 @@ spec:
     included_tables: ["openstack*"]
     excluded_tables:
       [
-        "openstack_ironic*",
-        "openstack_nova_images",
-        "openstack_nova_networks",
-        "openstack_nova_secgroups",
-        "openstack_nova_tenant*",
-        "openstack_keystone_tenants",
+        "openstack_baremetal*",
+        "openstack_compute_images",
+        "openstack_compute_networks",
+        "openstack_compute_secgroups",
+        "openstack_compute_tenant*",
+        "openstack_identity_tenants",
       ]
 # ---
 # kind: source

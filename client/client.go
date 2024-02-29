@@ -148,28 +148,28 @@ func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient,
 
 const (
 	// defaults currently referring to Train
-	DefaultIronicV1Microversion   = "1.58"
-	DefaultNovaV2Microversion     = "2.79"
-	DefaultKeystoneV3Microversion = "3.13"
-	DefaultCinderV3Microversion   = "3.59"
-	DefaultGlanceV2Microversion   = "2.9"
+	DefaultBareMetalV1Microversion    = "1.58"
+	DefaultComputeV2Microversion      = "2.79"
+	DefaultIdentityV3Microversion     = "3.13"
+	DefaultBlockStorageV3Microversion = "3.59"
+	DefaultImageV2Microversion        = "2.9"
 )
 
 type ServiceType string
 
 const (
-	// IronicV1 identifies the OpenStack Baremetal V1 service (Ironic).
-	IronicV1 = "openstack_ironic_v1"
-	// KeystoneV3 identifies the OpenStack Identity V3 service (Keystone).
-	KeystoneV3 ServiceType = "openstack_keystone_v3"
-	// Compute identifies the penStack Compute V2 service (Nova).
-	NovaV2 = "openstack_nova_v2"
-	// NeutronV2 identifies the OpenStack Network V2 service (Neutron).
-	NeutronV2 = "openstack_neutron_v2"
-	// CinderV3 identifies the OpenStack Block Storage V3 service (Cinder).
-	CinderV3 = "openstack_cinder_v3"
-	// GlanceV2 identifies the OpenStack Image Service V2 service (Glance).
-	GlanceV2 = "openstack_glance_v2"
+	// BareMetalV1 identifies the OpenStack Baremetal V1 service (BareMetal).
+	BareMetalV1 = "openstack_baremetal_v1"
+	// IdentityV3 identifies the OpenStack Identity V3 service (Identity).
+	IdentityV3 ServiceType = "openstack_identity_v3"
+	// Compute identifies the penStack Compute V2 service (Compute).
+	ComputeV2 = "openstack_compute_v2"
+	// NetworkingV2 identifies the OpenStack Network V2 service (Networking).
+	NetworkingV2 = "openstack_networking_v2"
+	// BlockStorageV3 identifies the OpenStack Block Storage V3 service (BlockStorage).
+	BlockStorageV3 = "openstack_blockstorage_v3"
+	// ImageV2 identifies the OpenStack Image Service V2 service (Image).
+	ImageV2 = "openstack_image_v2"
 )
 
 type serviceConfig struct {
@@ -178,59 +178,59 @@ type serviceConfig struct {
 }
 
 var serviceConfigMap = map[ServiceType]serviceConfig{
-	IronicV1: {
+	BareMetalV1: {
 		newClient: openstack.NewBareMetalV1,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultIronicV1Microversion
-			if spec.IronicV1Microversion != nil {
-				microversion = *spec.IronicV1Microversion
+			microversion := DefaultBareMetalV1Microversion
+			if spec.BareMetalV1Microversion != nil {
+				microversion = *spec.BareMetalV1Microversion
 			}
 			return microversion
 		},
 	},
-	KeystoneV3: {
+	IdentityV3: {
 		newClient: openstack.NewIdentityV3,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultKeystoneV3Microversion
-			if spec.KeystoneV3Microversion != nil {
-				microversion = *spec.KeystoneV3Microversion
+			microversion := DefaultIdentityV3Microversion
+			if spec.IdentityV3Microversion != nil {
+				microversion = *spec.IdentityV3Microversion
 			}
 			return microversion
 		},
 	},
-	NovaV2: {
+	ComputeV2: {
 		newClient: openstack.NewComputeV2,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultNovaV2Microversion
-			if spec.NovaV2Microversion != nil {
-				microversion = *spec.NovaV2Microversion
+			microversion := DefaultComputeV2Microversion
+			if spec.ComputeV2Microversion != nil {
+				microversion = *spec.ComputeV2Microversion
 			}
 			return microversion
 		},
 	},
-	NeutronV2: {
+	NetworkingV2: {
 		newClient: openstack.NewNetworkV2,
 		getMicroversion: func(spec *Spec) string {
 			// TODO: check if we need to leverage/support micro-versions
 			return ""
 		},
 	},
-	CinderV3: {
+	BlockStorageV3: {
 		newClient: openstack.NewBlockStorageV3,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultCinderV3Microversion
-			if spec.CinderV3Microversion != nil {
-				microversion = *spec.CinderV3Microversion
+			microversion := DefaultBlockStorageV3Microversion
+			if spec.BlockStorageV3Microversion != nil {
+				microversion = *spec.BlockStorageV3Microversion
 			}
 			return microversion
 		},
 	},
-	GlanceV2: {
+	ImageV2: {
 		newClient: openstack.NewImageServiceV2,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultGlanceV2Microversion
-			if spec.GlanceV2Microversion != nil {
-				microversion = *spec.GlanceV2Microversion
+			microversion := DefaultImageV2Microversion
+			if spec.ImageV2Microversion != nil {
+				microversion = *spec.ImageV2Microversion
 			}
 			return microversion
 		},
