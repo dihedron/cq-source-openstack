@@ -28,7 +28,7 @@ func fetchImageMembers(ctx context.Context, meta schema.ClientMeta, parent *sche
 
 	api := meta.(*client.Client)
 
-	image, err := api.GetServiceClient(client.ImageV2)
+	image_service, err := api.GetServiceClient(client.ImageV2)
 	if err != nil {
 		api.Logger().Error().Err(err).Msg("error retrieving client")
 		return err
@@ -37,7 +37,7 @@ func fetchImageMembers(ctx context.Context, meta schema.ClientMeta, parent *sche
 	image := parent.Item.(images.Image)
 
 	imageID := image.ID
-	allPages, err := members.List(image, imageID).AllPages()
+	allPages, err := members.List(image_service, imageID).AllPages()
 	if err != nil {
 		api.Logger().Error().Err(err).Msg("error listing image members")
 		return err
