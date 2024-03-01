@@ -10,5 +10,6 @@ func Plugin() *plugin.Plugin {
 		internalPlugin.Name,
 		internalPlugin.Version,
 		Configure,
+		plugin.WithKind(internalPlugin.Kind),
 	)
 }
