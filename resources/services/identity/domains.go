@@ -19,6 +19,9 @@ func Domains() *schema.Table {
 			&domains.Domain{},
 			transformers.WithSkipFields("Links"),
 		),
+		Relations: []*schema.Table{
+			DomainGroups(),
+		},
 	}
 }
 

@@ -17,7 +17,7 @@ func QuotaSetsUsage() *schema.Table {
 		Name:     "openstack_blockstorage_quotasets_usage",
 		Resolver: fetchQuotaSetsUsage,
 		Transform: transformers.TransformWithStruct(
-			&QuotaUsageSet{},
+			&quotasets.QuotaUsageSet{},
 			transformers.WithNameTransformer(transform.TagNameTransformer), // use cq-name tags to translate name
 			transformers.WithSkipFields("Volumes", "Snapshots", "Gigabytes", "PerVolumeGigabytes", "Backups", "BackupGigabytes", "Groups"),
 		),
@@ -242,50 +242,4 @@ func fetchQuotaSetsUsage(ctx context.Context, meta schema.ClientMeta, parent *sc
 		res <- quotausageset
 	}
 	return nil
-}
-
-type QuotaUsageSet struct {
-	ID      string `json:"id"`
-	Volumes struct {
-		InUse     int `json:"in_use" cq-name:"volumes_in_use"`
-		Allocated int `json:"allocated" cq-name:"volumes_allocated"`
-		Reserved  int `json:"reserved" cq-name:"volumes_reserved"`
-		Limit     int `json:"limit" cq-name:"volumes_limit"`
-	} `json:"volumes"`
-	Snapshots struct {
-		InUse     int `json:"in_use" cq-name:"snapshots_in_use"`
-		Allocated int `json:"allocated" cq-name:"snapshots_allocated"`
-		Reserved  int `json:"reserved" cq-name:"snapshots_reserved"`
-		Limit     int `json:"limit" cq-name:"snapshots_limit"`
-	} `json:"snapshots"`
-	Gigabytes struct {
-		InUse     int `json:"in_use" cq-name:"gigabytes_in_use"`
-		Allocated int `json:"allocated" cq-name:"gigabytes_allocated"`
-		Reserved  int `json:"reserved" cq-name:"gigabytes_reserved"`
-		Limit     int `json:"limit" cq-name:"gigabytes_limit"`
-	} `json:"gigabytes"`
-	PerVolumeGigabytes struct {
-		InUse     int `json:"in_use" cq-name:"per_volume_gigabytes_in_use"`
-		Allocated int `json:"allocated" cq-name:"per_volume_gigabytes_allocated"`
-		Reserved  int `json:"reserved" cq-name:"per_volume_gigabytes_reserved"`
-		Limit     int `json:"limit" cq-name:"per_volume_gigabytes_limit"`
-	} `json:"per_volume_gigabytes"`
-	Backups struct {
-		InUse     int `json:"in_use" cq-name:"backups_in_use"`
-		Allocated int `json:"allocated" cq-name:"backups_allocated"`
-		Reserved  int `json:"reserved" cq-name:"backups_reserved"`
-		Limit     int `json:"limit" cq-name:"backups_limit"`
-	} `json:"backups"`
-	BackupGigabytes struct {
-		InUse     int `json:"in_use" cq-name:"backup_gigabytes_in_use"`
-		Allocated int `json:"allocated" cq-name:"backup_gigabytes_allocated"`
-		Reserved  int `json:"reserved" cq-name:"backup_gigabytes_reserved"`
-		Limit     int `json:"limit" cq-name:"backup_gigabytes_limit"`
-	} `json:"backup_gigabytes"`
-	Groups struct {
-		InUse     int `json:"in_use" cq-name:"groups_in_use"`
-		Allocated int `json:"allocated" cq-name:"groups_allocated"`
-		Reserved  int `json:"reserved" cq-name:"groups_reserved"`
-		Limit     int `json:"limit" cq-name:"groups_limit"`
-	} `json:"groups"`
 }

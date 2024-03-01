@@ -29,16 +29,6 @@ func Volumes() *schema.Table {
 		Relations: []*schema.Table{
 			VolumesBackups(),
 		},
-		// Columns: []schema.Column{
-		// 	{
-		// 		Name:        "tags",
-		// 		Type:        schema.TypeStringArray,
-		// 		Description: "The set of tags on the project.",
-		// 		Resolver: transform.Apply(
-		// 			transform.OnObjectField("Tags"),
-		// 		),
-		// 	},
-		// },
 	}
 }
 
