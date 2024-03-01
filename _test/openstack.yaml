@@ -18,15 +18,7 @@ spec:
     app_credential_id: ${OPENSTACK_APP_CREDENTIAL_ID}
     app_credential_secret: ${OPENSTACK_APP_CREDENTIAL_SECRET}
     included_tables: ["openstack*"]
-    excluded_tables:
-      [
-        "openstack_baremetal*",
-        "openstack_compute_images",
-        "openstack_compute_networks",
-        "openstack_compute_secgroups",
-        "openstack_compute_tenant*",
-        "openstack_identity_tenants",
-      ]
+    excluded_tables: ["openstack_baremetal*"]
 # ---
 # kind: source
 # spec:
