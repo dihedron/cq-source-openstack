@@ -28,14 +28,12 @@ func fetchInstanceSecurityGroups(ctx context.Context, meta schema.ClientMeta, pa
 
 	instance := parent.Item.(*Instance)
 
-	//if instance.SecurityGroups != nil {
 	for _, group := range instance.SecurityGroups {
 		api.Logger().Debug().Str("instance id", instance.ID).Msg("streaming instance security group")
-		res <- SecurityGroup{
+		res <- InstanceSecurityGroup{
 			Name: group.Name,
 		}
 	}
-	//}
 	return nil
 }
 

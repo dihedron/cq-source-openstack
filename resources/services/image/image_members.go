@@ -36,27 +36,30 @@ func fetchImageMembers(ctx context.Context, meta schema.ClientMeta, parent *sche
 
 	image := parent.Item.(images.Image)
 
-	imageID := image.ID
-	allPages, err := members.List(image_service, imageID).AllPages()
-	if err != nil {
-		api.Logger().Error().Err(err).Msg("error listing image members")
-		return err
-	}
-
-	allMembers, err := members.ExtractMembers(allPages)
-	if err != nil {
-		api.Logger().Error().Err(err).Msg("error extracting image members")
-		return err
-	}
-	api.Logger().Debug().Int("count", len(allMembers)).Msg("image members retrieved")
-
-	for _, member := range allMembers {
-		if ctx.Err() != nil {
-			api.Logger().Debug().Msg("context done, exit")
-			break
+	// An image must have the shared visibility in order for image members to be added to it.
+	if image.Visibility == "shared" {
+		imageID := image.ID
+		allPages, err := members.List(image_service, imageID).AllPages()
+		if err != nil {
+			api.Logger().Error().Err(err).Msg("error listing image members")
+			return err
 		}
-		api.Logger().Debug().Str("member id", member.MemberID).Str("data", format.ToJSON(member)).Msg("streaming image member")
-		res <- member
+
+		allMembers, err := members.ExtractMembers(allPages)
+		if err != nil {
+			api.Logger().Error().Err(err).Msg("error extracting image members")
+			return err
+		}
+		api.Logger().Debug().Int("count", len(allMembers)).Msg("image members retrieved")
+
+		for _, member := range allMembers {
+			if ctx.Err() != nil {
+				api.Logger().Debug().Msg("context done, exit")
+				break
+			}
+			api.Logger().Debug().Str("member id", member.MemberID).Str("data", format.ToJSON(member)).Msg("streaming image member")
+			res <- member
+		}
 	}
 
 	return nil
