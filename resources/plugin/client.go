@@ -104,6 +104,7 @@ func getTables(spec *client.Spec) schema.Tables {
 		compute.Hypervisors(),
 		compute.Instances(),
 		compute.ServerUsage(),
+		identity.Catalog(),
 		identity.Domains(),
 		identity.Projects(),
 		identity.Regions(),
