@@ -3,7 +3,7 @@ package blockstorage
 import (
 	"context"
 
-	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
+	"github.com/dihedron/cq-plugin-utils/utils"
 
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"

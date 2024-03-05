@@ -7,8 +7,8 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/format"
 	"github.com/dihedron/cq-plugin-utils/transform"
+	"github.com/dihedron/cq-plugin-utils/utils"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
 	"github.com/gophercloud/gophercloud/openstack/baremetal/v1/ports"
 )
 

@@ -10,8 +10,8 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/scheduler"
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
+	"github.com/dihedron/cq-plugin-utils/pattern_matcher"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/resources/internal/pattern_matcher"
 
 	"github.com/dihedron/cq-source-openstack/resources/services/baremetal"
 	"github.com/dihedron/cq-source-openstack/resources/services/blockstorage"
@@ -124,8 +124,8 @@ func getTables(spec *client.Spec) schema.Tables {
 	excludesFromSpec := spec.ExcludedTables
 
 	pm := pattern_matcher.New(
-		pattern_matcher.WithInclude(includesFromSpec),
-		pattern_matcher.WithExclude(excludesFromSpec),
+		pattern_matcher.WithReplaceIncludes(includesFromSpec),
+		pattern_matcher.WithReplaceExcludes(excludesFromSpec),
 	)
 
 	tables := schema.Tables{}

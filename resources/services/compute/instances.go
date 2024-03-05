@@ -3,7 +3,7 @@ package compute
 import (
 	"context"
 
-	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
+	"github.com/dihedron/cq-plugin-utils/utils"
 
 	"github.com/apache/arrow/go/v15/arrow"
 	"github.com/cloudquery/plugin-sdk/v4/schema"

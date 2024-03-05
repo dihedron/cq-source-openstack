@@ -6,8 +6,8 @@ import (
 	"github.com/cloudquery/plugin-sdk/v4/schema"
 	"github.com/cloudquery/plugin-sdk/v4/transformers"
 	"github.com/dihedron/cq-plugin-utils/transform"
+	"github.com/dihedron/cq-plugin-utils/utils"
 	"github.com/dihedron/cq-source-openstack/client"
-	"github.com/dihedron/cq-source-openstack/resources/internal/utils"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
 )
 
