@@ -4,9 +4,9 @@ go 1.22.0
 
 require (
 	github.com/apache/arrow/go/v15 v15.0.0
-	github.com/cloudquery/plugin-sdk/v4 v4.32.0
-	github.com/dihedron/cq-plugin-utils v0.0.0-20240305074643-428c35136dea
-	github.com/gophercloud/gophercloud v1.10.0
+	github.com/cloudquery/plugin-sdk/v4 v4.32.1
+	github.com/dihedron/cq-plugin-utils v0.0.0-20240305171256-191da1281a50
+	github.com/gophercloud/gophercloud v1.11.0
 	github.com/rs/zerolog v1.32.0
 )
 
@@ -46,10 +46,10 @@ require (
 	github.com/go-playground/validator/v10 v10.19.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20231222211730-1d6d20845b47 // indirect
-	github.com/google/flatbuffers v23.5.26+incompatible // indirect
+	github.com/google/flatbuffers v24.3.6+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1 // indirect
@@ -121,8 +121,8 @@ require (
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240304212257-790db918fca8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240304212257-790db918fca8 // indirect
-	google.golang.org/grpc v1.62.0 // indirect
-	google.golang.org/protobuf v1.32.0 // indirect
+	google.golang.org/grpc v1.62.1 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
