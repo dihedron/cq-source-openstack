@@ -80,11 +80,6 @@ func New(ctx context.Context, logger zerolog.Logger, spec *Spec) (*Client, error
 		auth.AllowReauth = *spec.AllowReauth
 	}
 
-	//
-	// IMPORTANT NOTE: when using App Credentials, it is necessary
-	// that all other fields except the endpoint URL be left blank!
-	//
-
 	client, err := openstack.AuthenticatedClient(auth)
 	if err != nil {
 		logger.Error().Err(err).Msg("error creating authenticated client")
