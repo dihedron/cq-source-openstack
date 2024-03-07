@@ -32,36 +32,30 @@ func fetchServices(ctx context.Context, meta schema.ClientMeta, parent *schema.R
 		return err
 	}
 
-	service_types := [5]string{"blockstorage", "compute", "identity", "imageservice", "networking"}
-	result := []services.Service{}
-	for _, service_type := range service_types {
-		service_type := service_type
-		opts := services.ListOpts{
-			ServiceType: service_type,
-		}
-
-		allPages, err := services.List(identity, opts).AllPages()
-		if err != nil {
-			api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing services with options")
-			return err
-		}
-
-		allServices, err := services.ExtractServices(allPages)
-		if err != nil {
-			api.Logger().Error().Err(err).Msg("error extracting services")
-			return err
-		}
-		api.Logger().Debug().Int("count", len(allServices)).Msg("services retrieved")
-
-		for _, service := range allServices {
-			if ctx.Err() != nil {
-				api.Logger().Debug().Msg("context done, exit")
-				break
-			}
-			api.Logger().Debug().Str("service id", service.ID).Str("data", format.ToJSON(service)).Msg("streaming service")
-			result = append(result, service)
-		}
+	opts := services.ListOpts{
+		// ServiceType: catalog.Type,
 	}
-	res <- result
+
+	allPages, err := services.List(identity, opts).AllPages()
+	if err != nil {
+		api.Logger().Error().Err(err).Str("options", format.ToPrettyJSON(opts)).Msg("error listing services with options")
+		return err
+	}
+
+	allService, err := services.ExtractServices(allPages)
+	if err != nil {
+		api.Logger().Error().Err(err).Msg("error extracting services")
+		return err
+	}
+	api.Logger().Debug().Int("count", len(allService)).Msg("services retrieved")
+
+	for _, service := range allService {
+		if ctx.Err() != nil {
+			api.Logger().Debug().Msg("context done, exit")
+			break
+		}
+		api.Logger().Debug().Str("service id", service.ID).Str("data", format.ToJSON(service)).Msg("streaming service")
+		res <- service
+	}
 	return nil
 }
