@@ -39,45 +39,10 @@ func New(ctx context.Context, logger zerolog.Logger, spec *Spec) (*Client, error
 		return nil, fmt.Errorf("error spec not valid: %w", err)
 	}
 
-	auth := gophercloud.AuthOptions{
-		AllowReauth: true,
-	}
-
-	if spec.EndpointUrl != nil {
-		auth.IdentityEndpoint = *spec.EndpointUrl
-	}
-	if spec.UserID != nil {
-		auth.UserID = *spec.UserID
-	}
-	if spec.Username != nil {
-		auth.Username = *spec.Username
-	}
-	if spec.Password != nil {
-		auth.Password = *spec.Password
-	}
-	if spec.ProjectID != nil {
-		auth.TenantID = *spec.ProjectID
-	}
-	if spec.ProjectName != nil {
-		auth.TenantName = *spec.ProjectName
-	}
-	if spec.DomainID != nil {
-		auth.DomainID = *spec.DomainID
-	}
-	if spec.DomainName != nil {
-		auth.DomainName = *spec.DomainName
-	}
-	if spec.AccessToken != nil {
-		auth.TokenID = *spec.AccessToken
-	}
-	if spec.AppCredentialID != nil {
-		auth.ApplicationCredentialID = *spec.AppCredentialID
-	}
-	if spec.AppCredentialSecret != nil {
-		auth.ApplicationCredentialSecret = *spec.AppCredentialSecret
-	}
-	if spec.AllowReauth != nil {
-		auth.AllowReauth = *spec.AllowReauth
+	auth, err := spec.AssignValues()
+	if err != nil {
+		logger.Error().Err(err).Msg("error creating authentication options")
+		return nil, err
 	}
 
 	client, err := openstack.AuthenticatedClient(auth)

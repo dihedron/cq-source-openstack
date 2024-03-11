@@ -4,13 +4,14 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/rs/zerolog/log"
 )
 
 type ErrTooManyFields struct{}
 
 func (e *ErrTooManyFields) Error() string {
-	return "too many fields has been set up."
+	return "too many fields have been set up."
 }
 
 type Spec struct {
@@ -37,30 +38,62 @@ type Spec struct {
 	ExcludedTables             []string `json:"excluded_tables,omitempty" yaml:"excluded_tables,omitempty"`
 }
 
+func (s *Spec) AssignValues() (gophercloud.AuthOptions, error) {
+	auth := gophercloud.AuthOptions{}
+
+	if s.EndpointUrl != nil {
+		auth.IdentityEndpoint = *s.EndpointUrl
+	}
+	if s.UserID != nil {
+		auth.UserID = *s.UserID
+	}
+	if s.Username != nil {
+		auth.Username = *s.Username
+	}
+	if s.Password != nil {
+		auth.Password = *s.Password
+	}
+	if s.ProjectID != nil {
+		auth.TenantID = *s.ProjectID
+	}
+	if s.ProjectName != nil {
+		auth.TenantName = *s.ProjectName
+	}
+	if s.DomainID != nil {
+		auth.DomainID = *s.DomainID
+	}
+	if s.DomainName != nil {
+		auth.DomainName = *s.DomainName
+	}
+	if s.AccessToken != nil {
+		auth.TokenID = *s.AccessToken
+	}
+	if s.AppCredentialID != nil {
+		auth.ApplicationCredentialID = *s.AppCredentialID
+	}
+	if s.AppCredentialSecret != nil {
+		auth.ApplicationCredentialSecret = *s.AppCredentialSecret
+	}
+	if s.AllowReauth != nil {
+		auth.AllowReauth = *s.AllowReauth
+	} else {
+		auth.AllowReauth = true
+	}
+
+	_, err := auth.ToTokenV3CreateMap(nil)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to initialize auth options.")
+		return auth, err
+	}
+
+	return auth, nil
+}
+
 func (s *Spec) Validate() error {
 	endpointErr := validateEndpointURL(s.EndpointUrl)
 	if endpointErr != nil {
 		log.Error().Err(endpointErr).Msg("validation endpoint URL failed.")
 		return endpointErr
-	}
-	appCredentialsErr := s.ValidateAppCredentials()
-	if appCredentialsErr != nil {
-		log.Error().Err(appCredentialsErr).Msg("too many fields has been set to use app credentials.")
-		return appCredentialsErr
-	}
-	return nil
-}
-
-func (s *Spec) ValidateAppCredentials() error {
-	// IMPORTANT NOTE: when using App Credentials, it is necessary
-	// that all other fields except the endpoint URL be left blank!
-	// Check that no other fields are set
-	if s.AppCredentialID != nil && s.AppCredentialSecret != nil {
-		if s.UserID != nil || s.Username != nil || s.Password != nil || s.Region != nil || s.ProjectID != nil || s.ProjectName != nil || s.DomainID != nil || s.DomainName != nil || s.AccessToken != nil {
-			err := &ErrTooManyFields{}
-			log.Error().Err(err).Msg("too many fields has been set to use app credentials.")
-			return err
-		}
 	}
 	return nil
 }
