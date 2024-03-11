@@ -8,11 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type ErrTooManyFields struct{}
-
-func (e *ErrTooManyFields) Error() string {
-	return "too many fields have been set up."
-}
 
 type Spec struct {
 	EndpointUrl                *string  `json:"endpoint_url,omitempty" yaml:"endpoint_url,omitempty"`
@@ -90,29 +85,24 @@ func (s *Spec) AssignValues() (gophercloud.AuthOptions, error) {
 }
 
 func (s *Spec) Validate() error {
-	endpointErr := validateEndpointURL(s.EndpointUrl)
-	if endpointErr != nil {
-		log.Error().Err(endpointErr).Msg("validation endpoint URL failed.")
-		return endpointErr
+	if s.EndpointUrl == nil {
+		log.Error().Msg("missing endpoint URL")
+		return nil
 	}
-	return nil
-}
-
-func (s *Spec) SetDefaults() {
-}
-
-func validateEndpointURL(endpoint *string) error {
 	// Check that the endpoint URL is a valid URL
-	_, err := url.ParseRequestURI(*endpoint)
+	_, err := url.ParseRequestURI(*s.EndpointUrl)
 	if err != nil {
 		log.Error().Err(err).Msg("invalid endpoint URL.")
 		return err
 	}
 	// Check that the endpoint URL is reachable
-	_, err = http.Get(*endpoint)
+	_, err = http.Get(*s.EndpointUrl)
 	if err != nil {
 		log.Error().Err(err).Msg("unreachable endpoint URL.")
 		return err
 	}
 	return nil
+}
+
+func (s *Spec) SetDefaults() {
 }
