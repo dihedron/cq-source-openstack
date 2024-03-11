@@ -34,8 +34,11 @@ type Client struct {
 
 func Configure(ctx context.Context, logger zerolog.Logger, spec []byte, opts plugin.NewClientOptions) (plugin.Client, error) {
 	config := &client.Spec{}
-	if err := json.Unmarshal(spec, config); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal spec: %w", err)
+	// this prevents go doc to fail when spec is empty
+	if len(spec) != 0 {
+		if err := json.Unmarshal(spec, config); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal spec: %w", err)
+		}
 	}
 
 	tables := getTables(config)

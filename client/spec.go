@@ -8,7 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-
 type Spec struct {
 	EndpointUrl                *string  `json:"endpoint_url,omitempty" yaml:"endpoint_url,omitempty"`
 	UserID                     *string  `json:"userid,omitempty" yaml:"userid,omitempty"`
