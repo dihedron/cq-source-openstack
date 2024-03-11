@@ -1,7 +1,7 @@
 package plugin
 
 var (
-	Name    = "dihedron-openstack"
+	Name    = "cq-source-openstack"
 	Kind    = "source"
-	Version = "0.0.1"
+	Version = "0.1.0"
 )

@@ -1,6 +1,6 @@
 module github.com/dihedron/cq-source-openstack
 
-go 1.22.0
+go 1.22.1
 
 require (
 	github.com/apache/arrow/go/v15 v15.0.1
