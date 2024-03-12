@@ -2,13 +2,12 @@ kind: source
 spec:
   name: openstack_lab
   registry: local
-  path: "/data/workspaces/gomods/cq-source-openstack/dist/cq-source-openstack_linux_amd64_v1/cq-source-openstack"
+  path: "../dist/linux/amd64/cq-source-openstack"
   version: v1.0.0
-  tables: 
-    ["openstack*"]
+  tables: ["openstack*"]
   destinations:
-    - sqlite
-#    - postgresql
+    # - sqlite
+    - postgresql
   spec:
     endpoint_url: ${OPENSTACK_ENDPOINT_URL}
     username: ${OPENSTACK_USERNAME}
@@ -18,6 +17,8 @@ spec:
     domain_name: ${OPENSTACK_DOMAIN_NAME}
     app_credential_id: ${OPENSTACK_APP_CREDENTIAL_ID}
     app_credential_secret: ${OPENSTACK_APP_CREDENTIAL_SECRET}
+    included_tables: ["openstack*"]
+    excluded_tables: ["openstack_baremetal*"]
 # ---
 # kind: source
 # spec:
@@ -25,7 +26,7 @@ spec:
 #   path: cloudquery/gitlab
 #   version: v3.0.0
 #   tables: ["*"]
-#   destinations: 
+#   destinations:
 #     - sqlite
 #     - postgresql
 #   spec:
@@ -45,8 +46,8 @@ spec:
   name: postgresql
   registry: github
   path: cloudquery/postgresql
-  version: v7.1.6
+  version: v7.3.4
   spec:
-    connection_string: postgresql://cloudquery:cloudquery@localhost:15433/cloudquery?sslmode=disable    
-#    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable  
+    connection_string: postgresql://cloudquery:cloudquery@${DB_POSTGRES_URL}:5433/cloudquery?sslmode=disable
+#    connection_string: postgresql://cloudquery:cloudquery@localhost:5432/cloudquery?sslmode=disable
 #    connection_string: postgresql://superset:superset@localhost:15432/superset?sslmode=disable

@@ -33,51 +33,17 @@ func New(ctx context.Context, logger zerolog.Logger, spec *Spec) (*Client, error
 
 	logger.Debug().Str("spec", format.ToJSON(spec)).Msg("plugin configuration")
 
-	auth := gophercloud.AuthOptions{
-		AllowReauth: true,
+	err := spec.Validate()
+	if err != nil {
+		logger.Error().Err(err).Msg("invalid spec configuration")
+		return nil, fmt.Errorf("error spec not valid: %w", err)
 	}
 
-	if spec.EndpointUrl != nil {
-		auth.IdentityEndpoint = *spec.EndpointUrl
+	auth, err := spec.AssignValues()
+	if err != nil {
+		logger.Error().Err(err).Msg("error creating authentication options")
+		return nil, err
 	}
-	if spec.UserID != nil {
-		auth.UserID = *spec.UserID
-	}
-	if spec.Username != nil {
-		auth.Username = *spec.Username
-	}
-	if spec.Password != nil {
-		auth.Password = *spec.Password
-	}
-	if spec.ProjectID != nil {
-		auth.TenantID = *spec.ProjectID
-	}
-	if spec.ProjectName != nil {
-		auth.TenantName = *spec.ProjectName
-	}
-	if spec.DomainID != nil {
-		auth.DomainID = *spec.DomainID
-	}
-	if spec.DomainName != nil {
-		auth.DomainName = *spec.DomainName
-	}
-	if spec.AccessToken != nil {
-		auth.TokenID = *spec.AccessToken
-	}
-	if spec.AppCredentialID != nil {
-		auth.ApplicationCredentialID = *spec.AppCredentialID
-	}
-	if spec.AppCredentialSecret != nil {
-		auth.ApplicationCredentialSecret = *spec.AppCredentialSecret
-	}
-	if spec.AllowReauth != nil {
-		auth.AllowReauth = *spec.AllowReauth
-	}
-
-	//
-	// IMPORTANT NOTE: when using App Credentials, it is necessary
-	// that all other fields except the endpoint URL be left blank!
-	//
 
 	client, err := openstack.AuthenticatedClient(auth)
 	if err != nil {
@@ -142,25 +108,28 @@ func (c *Client) initServiceClient(key ServiceType) (*gophercloud.ServiceClient,
 
 const (
 	// defaults currently referring to Train
+	DefaultBareMetalV1Microversion    = "1.58"
 	DefaultComputeV2Microversion      = "2.79"
 	DefaultIdentityV3Microversion     = "3.13"
 	DefaultBlockStorageV3Microversion = "3.59"
-	DefaultImageServiceV2Microversion = "2.9"
+	DefaultImageV2Microversion        = "2.9"
 )
 
 type ServiceType string
 
 const (
-	// IdentityV3 identifies the OpenStack Identity V3 service (Keystone).
+	// BareMetalV1 identifies the OpenStack Baremetal V1 service (BareMetal).
+	BareMetalV1 = "openstack_baremetal_v1"
+	// IdentityV3 identifies the OpenStack Identity V3 service (Identity).
 	IdentityV3 ServiceType = "openstack_identity_v3"
-	// Compute identifies the penStack Compute V2 service (Nova).
+	// Compute identifies the penStack Compute V2 service (Compute).
 	ComputeV2 = "openstack_compute_v2"
-	// NetworkV2 identifies the OpenStack Network V2 service (Neutron).
-	NetworkV2 = "openstack_network_v2"
-	// BlockStorageV3 identifies the OpenStack Block Storage V3 service (Cinder).
+	// NetworkingV2 identifies the OpenStack Network V2 service (Networking).
+	NetworkingV2 = "openstack_networking_v2"
+	// BlockStorageV3 identifies the OpenStack Block Storage V3 service (BlockStorage).
 	BlockStorageV3 = "openstack_blockstorage_v3"
-	// ImageServiceV2 identifies the OpenStack Image Service V2 service (Glance).
-	ImageServiceV2 = "openstack_imageservice_v2"
+	// ImageV2 identifies the OpenStack Image Service V2 service (Image).
+	ImageV2 = "openstack_image_v2"
 )
 
 type serviceConfig struct {
@@ -169,6 +138,16 @@ type serviceConfig struct {
 }
 
 var serviceConfigMap = map[ServiceType]serviceConfig{
+	BareMetalV1: {
+		newClient: openstack.NewBareMetalV1,
+		getMicroversion: func(spec *Spec) string {
+			microversion := DefaultBareMetalV1Microversion
+			if spec.BareMetalV1Microversion != nil {
+				microversion = *spec.BareMetalV1Microversion
+			}
+			return microversion
+		},
+	},
 	IdentityV3: {
 		newClient: openstack.NewIdentityV3,
 		getMicroversion: func(spec *Spec) string {
@@ -189,7 +168,7 @@ var serviceConfigMap = map[ServiceType]serviceConfig{
 			return microversion
 		},
 	},
-	NetworkV2: {
+	NetworkingV2: {
 		newClient: openstack.NewNetworkV2,
 		getMicroversion: func(spec *Spec) string {
 			// TODO: check if we need to leverage/support micro-versions
@@ -206,12 +185,12 @@ var serviceConfigMap = map[ServiceType]serviceConfig{
 			return microversion
 		},
 	},
-	ImageServiceV2: {
+	ImageV2: {
 		newClient: openstack.NewImageServiceV2,
 		getMicroversion: func(spec *Spec) string {
-			microversion := DefaultImageServiceV2Microversion
-			if spec.ImageServiceV2Microversion != nil {
-				microversion = *spec.ImageServiceV2Microversion
+			microversion := DefaultImageV2Microversion
+			if spec.ImageV2Microversion != nil {
+				microversion = *spec.ImageV2Microversion
 			}
 			return microversion
 		},

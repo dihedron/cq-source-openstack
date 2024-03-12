@@ -1,11 +1,11 @@
 # CloudQuery OpenStack Source Plugin
 
-[![test](https://github.com/github.com/dihedron/cq-source-openstack/actions/workflows/test.yaml/badge.svg)](https://github.com/github.com/dihedron/cq-source-openstack/actions/workflows/test.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/github.com/dihedron/cq-source-openstack)](https://goreportcard.com/report/github.com/github.com/dihedron/cq-source-openstack)
+[![test](https://github.com/dihedron/cq-source-openstack/actions/workflows/test.yaml/badge.svg)](https://github.com/dihedron/cq-source-openstack/actions/workflows/test.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dihedron/cq-source-openstack)](https://goreportcard.com/report/github.com/dihedron/cq-source-openstack)
 
 A source plugin for CloudQuery that loads data from OpenStack to any database, data warehouse or data lake supported by [CloudQuery](https://www.cloudquery.io/), such as PostgreSQL, BigQuery, Athena, and many more.
 
-OpenStack is the most widely used open source cloud platform; it powers hundreds of private clouds and some public clouds too;. 
+OpenStack is the most widely used open source cloud platform; it powers hundreds of private clouds and some public clouds too. 
 
 ## Links
 

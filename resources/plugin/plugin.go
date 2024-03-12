@@ -2,12 +2,14 @@ package plugin
 
 import (
 	"github.com/cloudquery/plugin-sdk/v4/plugin"
-)
-
-var (
-	Version = "development"
+	internalPlugin "github.com/dihedron/cq-source-openstack/plugin"
 )
 
 func Plugin() *plugin.Plugin {
-	return plugin.NewPlugin("dihedron-openstack", Version, Configure)
+	return plugin.NewPlugin(
+		internalPlugin.Name,
+		internalPlugin.Version,
+		Configure,
+		plugin.WithKind(internalPlugin.Kind),
+	)
 }
